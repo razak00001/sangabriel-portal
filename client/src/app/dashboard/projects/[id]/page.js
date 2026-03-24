@@ -15,7 +15,8 @@ import {
   User as UserIcon,
   Download,
   Trash2,
-  AlertCircle
+  AlertCircle,
+  Plus
 } from 'lucide-react';
 import io from 'socket.io-client';
 
