@@ -43,6 +43,10 @@ const fileSchema = new mongoose.Schema({
   version: {
     type: Number,
     default: 1
+  },
+  parentFileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'File'
   }
 }, {
   timestamps: true

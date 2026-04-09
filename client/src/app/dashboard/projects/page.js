@@ -67,13 +67,15 @@ export default function ProjectsPage() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Created': return '#94a3b8';
-      case 'Design Phase': return '#6366f1';
-      case 'Client Review': return '#ec4899';
-      case 'Approved': return '#10b981';
-      case 'Installation Phase': return '#f59e0b';
-      case 'Completed': return '#10b981';
-      default: return '#94a3b8';
+      case 'DRAFT': return '#64748b';
+      case 'ACTIVE': return '#4338ca';
+      case 'IN PROGRESS': return '#2563eb';
+      case 'PENDING REVIEW': return '#db2777';
+      case 'REVISION REQUESTED': return '#d97706';
+      case 'COMPLETE': return '#059669';
+      case 'BILLED': return '#059669';
+      case 'ARCHIVED': return '#475569';
+      default: return '#64748b';
     }
   };
 
@@ -146,12 +148,14 @@ export default function ProjectsPage() {
             style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', outline: 'none', fontSize: '0.875rem' }}
           >
             <option value="All">All Statuses</option>
-            <option value="Created">Created</option>
-            <option value="Design Phase">Design Phase</option>
-            <option value="Client Review">Client Review</option>
-            <option value="Approved">Approved</option>
-            <option value="Installation Phase">Installation Phase</option>
-            <option value="Completed">Completed</option>
+            <option value="DRAFT">DRAFT</option>
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="IN PROGRESS">IN PROGRESS</option>
+            <option value="PENDING REVIEW">PENDING REVIEW</option>
+            <option value="REVISION REQUESTED">REVISION REQUESTED</option>
+            <option value="COMPLETE">COMPLETE</option>
+            <option value="BILLED">BILLED</option>
+            <option value="ARCHIVED">ARCHIVED</option>
           </select>
         </div>
       </div>
@@ -163,9 +167,17 @@ export default function ProjectsPage() {
       ) : filteredProjects.length > 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
           {filteredProjects.map((project) => (
-            <div key={project._id} className="glass" style={{ padding: '1.5rem', transition: 'transform 0.2s', cursor: 'pointer' }}
-                 onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-4px)')}
-                 onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+            <div key={project._id} className="glass" style={{ padding: '1.5rem', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'pointer' }}
+                 onMouseEnter={(e) => {
+                   e.currentTarget.style.transform = 'translateY(-6px)';
+                   e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                   e.currentTarget.style.borderColor = 'var(--primary)';
+                 }}
+                 onMouseLeave={(e) => {
+                   e.currentTarget.style.transform = 'translateY(0)';
+                   e.currentTarget.style.boxShadow = 'var(--shadow)';
+                   e.currentTarget.style.borderColor = 'var(--border)';
+                 }}
                  onClick={() => window.location.href = `/dashboard/projects/${project._id}`}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
@@ -193,7 +205,7 @@ export default function ProjectsPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                   <UserIcon size={14} />
-                  <span>{project.coordinator?.name || 'Unassigned'}</span>
+                  <span>{project.projectManager?.name || 'Unassigned'}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                   <Calendar size={14} />
@@ -202,9 +214,9 @@ export default function ProjectsPage() {
               </div>
 
               <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', gap: '4px' }}>
+                 <div style={{ display: 'flex', gap: '4px' }}>
                   {[1, 2, 3].map(i => (
-                    <div key={i} style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--glass-border)', border: '2px solid var(--bg-dark)', marginLeft: i > 1 ? '-8px' : 0 }}></div>
+                    <div key={i} style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--bg-dark)', border: '2px solid var(--bg-darker)', marginLeft: i > 1 ? '-8px' : 0 }}></div>
                   ))}
                 </div>
                 <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: '600' }}>4 Files</span>

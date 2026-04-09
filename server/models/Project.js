@@ -16,12 +16,19 @@ const projectSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Created', 'Design Phase', 'Client Review', 'Approved', 'Installation Phase', 'Completed'],
-    default: 'Created'
+    enum: ['DRAFT', 'ACTIVE', 'IN PROGRESS', 'PENDING REVIEW', 'REVISION REQUESTED', 'COMPLETE', 'BILLED', 'ARCHIVED'],
+    default: 'DRAFT'
   },
-  coordinator: {
+  projectManager: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
+  },
+  specialInstructions: {
+    type: String,
+    trim: true
+  },
+  archivedAt: {
+    type: Date
   },
   designer: {
     type: mongoose.Schema.Types.ObjectId,
@@ -39,6 +46,11 @@ const projectSchema = new mongoose.Schema({
     startDate: Date,
     endDate: Date
   },
+  milestones: [{
+    label: { type: String, required: true },
+    completed: { type: Boolean, default: false },
+    date: Date
+  }],
   files: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'File'
