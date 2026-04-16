@@ -55,7 +55,7 @@ export default function DashboardPage() {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>Overview</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Welcome back, {user?.name.split(' ')[0]}</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Welcome back, {user?.name?.split(' ')[0] || 'User'}</p>
         </div>
         
         {user?.role === 'Admin' && (
