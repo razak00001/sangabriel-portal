@@ -6,8 +6,7 @@ const { auth, authorize } = require('../middleware/auth');
 router.use(auth);
 
 // Admins can manage rates
-router.post('/', authorize('Admin'), rateController.createRate);
-router.patch('/:id', authorize('Admin'), rateController.updateRate);
+router.post('/', authorize('Admin'), rateController.updateRates);
 
 // Admin and Accounting can view rates
 router.get('/', authorize('Admin', 'Accounting'), rateController.getRates);

@@ -6,8 +6,7 @@ const { auth, authorize } = require('../middleware/auth');
 router.use(auth);
 
 // Only Admin can access reporting
-router.get('/job-volume', authorize('Admin'), reportController.getJobVolume);
-router.get('/status-distribution', authorize('Admin'), reportController.getStatusDistribution);
-router.get('/user-activity', authorize('Admin'), reportController.getUserActivity);
+router.get('/profitability/:projectId', authorize('Admin'), reportController.getProjectProfitability);
+router.get('/performance', authorize('Admin'), reportController.getGlobalPerformance);
 
 module.exports = router;
