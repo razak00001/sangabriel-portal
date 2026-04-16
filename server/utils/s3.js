@@ -31,7 +31,7 @@ const upload = multer({
       cb(null, { fieldName: file.fieldname });
     },
     key: function (req, file, cb) {
-      cb(null, `events/${Date.now().toString()}-${file.originalname}`);
+      cb(null, `sangabriel-portal/events/${Date.now().toString()}-${file.originalname}`);
     }
   })
 });
