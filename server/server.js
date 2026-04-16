@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const initSocket = require('./socket');
+const errorHandler = require('./middleware/errorMiddleware');
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -54,6 +55,9 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/uploads', express.static('uploads'));
+
+// Final Error Handler
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => {

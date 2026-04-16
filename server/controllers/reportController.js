@@ -1,68 +1,51 @@
 const Project = require('../models/Project');
-const User = require('../models/User');
-const ActivityLog = require('../models/ActivityLog');
+const asyncHandler = require('../utils/asyncHandler');
+const ErrorResponse = require('../utils/errorResponse');
 
-exports.getJobVolume = async (req, res) => {
-  try {
-    const volume = await Project.aggregate([
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { "_id": 1 } }
-    ]);
-    res.send(volume);
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-};
+// @desc    Get project profitability report
+// @route   GET /api/reports/profitability/:projectId
+// @access  Private/Admin
+exports.getProjectProfitability = asyncHandler(async (req, res, next) => {
+  const project = await Project.findById(req.params.projectId);
 
-exports.getStatusDistribution = async (req, res) => {
-  try {
-    const distribution = await Project.aggregate([
-      {
-        $group: {
-          _id: "$status",
-          count: { $sum: 1 }
-        }
-      }
-    ]);
-    res.send(distribution);
-  } catch (error) {
-    res.status(500).send({ error: error.message });
+  if (!project) {
+    return next(new ErrorResponse('Project not found', 404));
   }
-};
 
-exports.getUserActivity = async (req, res) => {
-  try {
-    const activity = await ActivityLog.aggregate([
-      {
-        $group: {
-          _id: "$user",
-          count: { $sum: 1 }
-        }
-      },
-      {
-        $lookup: {
-          from: 'users',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'userInfo'
-        }
-      },
-      { $unwind: "$userInfo" },
-      {
-        $project: {
-          name: "$userInfo.name",
-          role: "$userInfo.role",
-          count: 1
-        }
-      }
-    ]);
-    res.send(activity);
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-};
+  // Example logic for profitability
+  const designCost = project.milestones.filter(m => m.completed).length * 100; // Mock logic 
+  const totalInvoiced = project.budget || 0;
+  
+  const report = {
+    projectId: project._id,
+    title: project.title,
+    budget: totalInvoiced,
+    estimatedCost: designCost,
+    margin: totalInvoiced - designCost
+  };
+
+  res.status(200).json({
+    success: true,
+    data: report
+  });
+});
+
+// @desc    Get global performance stats
+// @route   GET /api/reports/performance
+// @access  Private/Admin
+exports.getGlobalPerformance = asyncHandler(async (req, res, next) => {
+  const [complete, active, billed] = await Promise.all([
+    Project.countDocuments({ status: 'COMPLETE' }),
+    Project.countDocuments({ status: 'ACTIVE' }),
+    Project.countDocuments({ status: 'BILLED' })
+  ]);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      completionRate: (complete / (complete + active || 1) * 100).toFixed(2),
+      activeProjects: active,
+      billedVolume: billed
+    }
+  });
+});

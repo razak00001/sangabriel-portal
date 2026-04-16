@@ -1,43 +1,33 @@
 const RateConfig = require('../models/RateConfig');
+const asyncHandler = require('../utils/asyncHandler');
+const ErrorResponse = require('../utils/errorResponse');
 
-exports.createRate = async (req, res) => {
-  try {
-    const { title, type, rate, currency } = req.body;
-    
-    // Deactivate previous active rate of the same title/type if versioning
-    // For simplicity, just create new one
-    const rateConfig = new RateConfig({
-      title,
-      type,
-      rate,
-      currency,
-      createdBy: req.user._id
-    });
-    
-    await rateConfig.save();
-    res.status(201).send(rateConfig);
-  } catch (error) {
-    res.status(400).send({ error: error.message });
-  }
-};
+// @desc    Get current rates
+// @route   GET /api/rates
+// @access  Private
+exports.getRates = asyncHandler(async (req, res, next) => {
+  const rates = await RateConfig.findOne().sort({ createdAt: -1 });
+  
+  res.status(200).json({
+    success: true,
+    data: rates || { designRate: 0, installationRate: 0 }
+  });
+});
 
-exports.getRates = async (req, res) => {
-  try {
-    const rates = await RateConfig.find({ isActive: true }).sort({ createdAt: -1 });
-    res.send(rates);
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-};
+// @desc    Update rates
+// @route   POST /api/rates
+// @access  Private/Admin
+exports.updateRates = asyncHandler(async (req, res, next) => {
+  const { designRate, installationRate } = req.body;
+  
+  const rates = await RateConfig.findOneAndUpdate(
+    {}, 
+    { designRate, installationRate, updatedAt: Date.now() },
+    { upsert: true, new: true }
+  );
 
-exports.updateRate = async (req, res) => {
-  try {
-    const rateConfig = await RateConfig.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!rateConfig) {
-      return res.status(404).send({ error: 'Rate not found' });
-    }
-    res.send(rateConfig);
-  } catch (error) {
-    res.status(400).send({ error: error.message });
-  }
-};
+  res.status(200).json({
+    success: true,
+    data: rates
+  });
+});

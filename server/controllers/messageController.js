@@ -1,59 +1,44 @@
 const Message = require('../models/Message');
-const User = require('../models/User');
-const { createNotification } = require('../utils/notificationService');
+const asyncHandler = require('../utils/asyncHandler');
+const ErrorResponse = require('../utils/errorResponse');
 
-exports.saveMessage = async (data) => {
-  try {
-    const message = new Message({
-      projectId: data.projectId,
-      sender: data.senderId,
-      content: data.content,
-      isInternal: data.isInternal !== undefined ? data.isInternal : true
-    });
-    await message.save();
+// @desc    Get messages for a project
+// @route   GET /api/messages/project/:projectId
+// @access  Private
+exports.getProjectMessages = asyncHandler(async (req, res, next) => {
+  const messages = await Message.find({ projectId: req.params.projectId })
+    .populate('sender', 'name role')
+    .sort({ createdAt: 1 });
 
-    // Parse for mentions (@Name)
-    const mentionRegex = /@(\w+)/g;
-    const matches = data.content.match(mentionRegex);
-    if (matches) {
-      for (const match of matches) {
-        const name = match.substring(1);
-        const user = await User.findOne({ name: new RegExp(`^${name}`, 'i') });
-        if (user) {
-          await createNotification({
-            recipient: user._id,
-            sender: data.senderId,
-            type: 'CHAT_MESSAGE',
-            title: 'You were mentioned',
-            message: `User mentioned you in a project chat: "${data.content.substring(0, 50)}..."`,
-            projectId: data.projectId
-          });
-        }
-      }
-    }
+  res.status(200).json({
+    success: true,
+    data: messages
+  });
+});
 
-    return await message.populate('sender');
-  } catch (error) {
-    console.error('Error saving message:', error);
-    return null;
+// @desc    Send a message
+// @route   POST /api/messages
+// @access  Private
+exports.sendMessage = asyncHandler(async (req, res, next) => {
+  const { projectId, text, files } = req.body;
+  
+  const message = new Message({
+    projectId,
+    sender: req.user._id,
+    text,
+    files
+  });
+
+  await message.save();
+  await message.populate('sender', 'name role');
+
+  // Trigger socket event (handled via socket.io global later)
+  if (global.io) {
+    global.io.to(projectId.toString()).emit('newMessage', message);
   }
-};
 
-exports.getProjectMessages = async (req, res) => {
-  try {
-    const { projectId } = req.params;
-    let query = { projectId };
-    
-    // Customers cannot see internal messages
-    if (req.user.role === 'Customer') {
-      query.isInternal = false;
-    }
-
-    const messages = await Message.find(query)
-      .populate('sender')
-      .sort({ createdAt: 1 });
-    res.send(messages);
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-};
+  res.status(201).json({
+    success: true,
+    data: message
+  });
+});

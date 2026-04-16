@@ -1,12 +1,27 @@
 const User = require('../models/User');
+const asyncHandler = require('../utils/asyncHandler');
+const ErrorResponse = require('../utils/errorResponse');
 
-exports.getUsersByRole = async (req, res) => {
-  try {
-    const { role } = req.query;
-    const query = role ? { role } : {};
-    const users = await User.find(query, 'name email role status');
-    res.send(users);
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-};
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private/Admin
+exports.getUsers = asyncHandler(async (req, res, next) => {
+  const users = await User.find().select('-password');
+  
+  res.status(200).json({
+    success: true,
+    data: users
+  });
+});
+
+// @desc    Get users by role
+// @route   GET /api/users/role/:role
+// @access  Private
+exports.getUsersByRole = asyncHandler(async (req, res, next) => {
+  const users = await User.find({ role: req.params.role }).select('name email role status');
+  
+  res.status(200).json({
+    success: true,
+    data: users
+  });
+});
