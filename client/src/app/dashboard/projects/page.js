@@ -34,7 +34,7 @@ export default function ProjectsPage() {
   const fetchProjects = async () => {
     try {
       const { data } = await api.get('/projects');
-      setProjects(data);
+      setProjects(data.data || []);
     } catch (error) {
       console.error('Error fetching projects:', error);
     } finally {
@@ -47,7 +47,7 @@ export default function ProjectsPage() {
     setIsCreating(true);
     try {
       const { data } = await api.post('/projects', newProject);
-      setProjects([data, ...projects]);
+      setProjects([data.data, ...projects]);
       setIsModalOpen(false);
       setNewProject({ title: '', clientName: '', description: '' });
     } catch (error) {
@@ -178,7 +178,7 @@ export default function ProjectsPage() {
                    e.currentTarget.style.boxShadow = 'var(--shadow)';
                    e.currentTarget.style.borderColor = 'var(--border)';
                  }}
-                 onClick={() => window.location.href = `/dashboard/projects/${project._id}`}
+                 onClick={() => window.location.href = `/dashboard/projects/view?id=${project._id}`}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
                 <span style={{ 

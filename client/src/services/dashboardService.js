@@ -12,9 +12,9 @@ export const dashboardService = {
     ]);
     
     return {
-      stats: statsRes.data,
-      recentProjects: projectsRes.data,
-      activity: activityRes.data
+      stats: statsRes.data.data || [],
+      recentProjects: projectsRes.data.data || [],
+      activity: activityRes.data.data || []
     };
   }
 };

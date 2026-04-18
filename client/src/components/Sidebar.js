@@ -45,7 +45,7 @@ export default function Sidebar() {
   const fetchNotifications = async () => {
     try {
       const { data } = await api.get('/notifications');
-      setNotifications(data);
+      setNotifications(data.data || []);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }

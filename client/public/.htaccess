@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Redirect direct .html requests to extensionless URL
+  RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /+(.*)\.html\ HTTP/
+  RewriteRule ^(.*)\.html$ /$1 [R=301,L]
+
+  # If the requested URL is a directory, look for index.html inside it
+  RewriteCond %{REQUEST_FILENAME}/index.html -f
+  RewriteRule ^(.*)$ $1/index.html [L]
+
+  # If the file with .html extension exists, serve it
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^(.*)$ $1.html [L]
+
+  # Fallback for paths that don't match anything
+  ErrorDocument 404 /404.html
+</IfModule>

@@ -126,7 +126,7 @@ export default function DashboardPage() {
                     <h4 style={{ fontSize: '0.9375rem', marginBottom: '0.25rem' }}>{project.title}</h4>
                     <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{project.clientName} • <span style={{ fontWeight: '600', color: 'var(--primary)' }}>{project.status}</span></p>
                   </div>
-                  <Link href={`/dashboard/projects/${project._id}`} className="btn-icon-secondary">
+                  <Link href={`/dashboard/projects/view?id=${project._id}`} className="btn-icon-secondary">
                     <ArrowRight size={16} />
                   </Link>
                 </div>

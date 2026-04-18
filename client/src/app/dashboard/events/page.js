@@ -18,8 +18,8 @@ export default function EventsAdminPage() {
         const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
 
         const [momentsRes, convRes] = await Promise.all([
-          axios.get('http://localhost:5001/api/sections/moments', { headers }),
-          axios.get('http://localhost:5001/api/sections/conversation', { headers })
+          axios.get('https://sangabriel-portal.onrender.com/api/sections/moments', { headers }),
+          axios.get('https://sangabriel-portal.onrender.com/api/sections/conversation', { headers })
         ]);
 
         setMomentsLayout(momentsRes.data);

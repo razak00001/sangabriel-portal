@@ -22,7 +22,7 @@ export default function TeamPage() {
   const fetchUsers = async () => {
     try {
       const data = await userService.getUsers();
-      setUsers(data); 
+      setUsers(data.data || []); 
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
