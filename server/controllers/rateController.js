@@ -14,8 +14,7 @@ exports.getRates = asyncHandler(async (req, res, next) => {
   });
 });
 
-const asyncHandler = require('../utils/asyncHandler');
-const ErrorResponse = require('../utils/errorResponse');
+
 
 // @desc    Update rates (Create new version)
 // @route   POST /api/rates
