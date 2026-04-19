@@ -12,6 +12,8 @@ export default function DashboardLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
+    // Only redirect if we are CERTAIN the user is not logged in
+    // i.e., loading is finished AND user is null
     if (!loading && !user) {
       router.push('/');
     }
@@ -24,9 +26,9 @@ export default function DashboardLayout({ children }) {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        background: 'var(--bg-dark)'
+        background: '#0f172a'
       }}>
-        <div style={{ width: '40px', height: '40px', border: '3px solid var(--glass-border)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <div style={{ width: '40px', height: '40px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#4f46e5', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
         <style dangerouslySetInnerHTML={{ __html: `
           @keyframes spin { to { transform: rotate(360deg); } }
         `}} />
@@ -37,9 +39,11 @@ export default function DashboardLayout({ children }) {
   if (!user) return null;
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-dark)' }}>
-      {/* Mobile/Tablet Header */}
-      <header className="show-mobile glass" style={{ 
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
+      <div className="mesh-gradient"></div>
+
+      {/* Mobile Header */}
+      <header className="show-mobile" style={{ 
         position: 'fixed', 
         top: 0, 
         left: 0, 
@@ -47,30 +51,27 @@ export default function DashboardLayout({ children }) {
         height: '64px', 
         display: 'flex', 
         alignItems: 'center', 
-        justifyContent: 'space-between', 
         padding: '0 1.25rem',
-        zIndex: 200,
-        borderRadius: 0,
-        borderBottom: '1px solid var(--border)',
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)'
+        zIndex: 500,
+        background: 'rgba(255,255,255,0.8)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid #e2e8f0'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            style={{ background: 'rgba(67, 56, 202, 0.05)', border: 'none', cursor: 'pointer', color: 'var(--primary)', padding: '0.6rem', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-          <h2 style={{ fontSize: '0.9375rem', fontWeight: '800', margin: 0, background: 'linear-gradient(to right, var(--primary), var(--secondary))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '0.05em' }}>
-            SAN GABRIEL
-          </h2>
-        </div>
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0f172a' }}
+        >
+          <Menu size={24} />
+        </button>
+        <span style={{ marginLeft: '1rem', fontWeight: '900', fontSize: '1rem', color: '#0f172a', letterSpacing: '0.05em' }}>
+          SAN GABRIEL
+        </span>
       </header>
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       
-      <main className="main-content" style={{ flex: 1, width: '100%', minHeight: '100vh' }}>
-        <div className="container" style={{ margin: '0 auto' }}>
+      <main className="main-content" style={{ flex: 1 }}>
+        <div className="fade-in">
           {children}
         </div>
       </main>
