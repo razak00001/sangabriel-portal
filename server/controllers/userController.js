@@ -35,3 +35,18 @@ exports.changePassword = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({ success: true, message: 'Password updated successfully' });
 });
+
+// @desc    Get users by role
+// @route   GET /api/users
+// @access  Private/Admin/Project Manager
+exports.getUsersByRole = asyncHandler(async (req, res, next) => {
+  const { role } = req.query;
+  const query = role ? { role } : {};
+  
+  const users = await User.find(query).select('name email role status');
+
+  res.status(200).json({
+    success: true,
+    data: users
+  });
+});
