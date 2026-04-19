@@ -68,12 +68,12 @@ export default function TeamPage() {
   return (
     <div className="fade-in">
       {/* Header */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem' }}>
+      <header className="mobile-header-stack">
         <div>
-          <h1 style={{ fontSize: '2.25rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.25rem', letterSpacing: '-0.02em' }}>
             Team Management
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
             Manage your organization's members and collaborators.
           </p>
         </div>
@@ -89,25 +89,25 @@ export default function TeamPage() {
       </header>
 
       {/* Stats Overview */}
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
+      <section className="responsive-grid" style={{ marginBottom: '3rem' }}>
         {stats.map((stat, i) => (
           <Card key={i}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-              <div style={{ padding: '0.75rem', borderRadius: '12px', background: `${stat.color}10`, color: stat.color }}>
-                <stat.icon size={24} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ padding: '0.6rem', borderRadius: '10px', background: `${stat.color}10`, color: stat.color }}>
+                <stat.icon size={22} />
               </div>
-              <div>
+              <div style={{ overflow: 'hidden' }}>
                 <p style={{ 
-                  fontSize: '0.75rem', 
-                  fontWeight: '700', 
+                  fontSize: '0.625rem', 
+                  fontWeight: '800', 
                   color: 'var(--text-muted)', 
                   textTransform: 'uppercase', 
                   letterSpacing: '0.05em', 
-                  marginBottom: '0.25rem' 
+                  marginBottom: '0.125rem' 
                 }}>
                   {stat.label}
                 </p>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '800' }}>{stat.value}</h3>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: '800' }}>{stat.value}</h3>
               </div>
             </div>
           </Card>
@@ -117,15 +117,17 @@ export default function TeamPage() {
       {/* User Table */}
       <Card padding="0">
         <div style={{ 
-          padding: '1.5rem 2rem', 
+          padding: '1.25rem 1.5rem', 
           borderBottom: '1px solid var(--border)', 
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center', 
-          background: 'rgba(255,255,255,0.5)' 
+          background: 'rgba(255,255,255,0.5)',
+          gap: '1rem',
+          flexWrap: 'wrap'
         }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: '700' }}>User Directory</h3>
-          <div style={{ position: 'relative' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: '800' }}>User Directory</h3>
+          <div style={{ position: 'relative', flex: 1, minWidth: '200px', maxWidth: '300px' }}>
             <Search size={16} style={{ 
               position: 'absolute', 
               left: '1rem', 
@@ -142,147 +144,145 @@ export default function TeamPage() {
                 border: '1px solid var(--border)', 
                 fontSize: '0.8125rem', 
                 outline: 'none', 
-                width: '240px' 
+                width: '100%' 
               }} 
             />
           </div>
         </div>
         
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
-          <thead>
-            <tr style={{ textAlign: 'left', background: 'var(--bg-dark)', borderBottom: '1px solid var(--border)' }}>
-              <th style={{ 
-                padding: '1rem 2rem', 
-                color: 'var(--text-muted)', 
-                fontWeight: '700', 
-                fontSize: '0.75rem', 
-                textTransform: 'uppercase', 
-                letterSpacing: '0.05em' 
-              }}>
-                Member Details
-              </th>
-              <th style={{ 
-                padding: '1rem 2rem', 
-                color: 'var(--text-muted)', 
-                fontWeight: '700', 
-                fontSize: '0.75rem', 
-                textTransform: 'uppercase', 
-                letterSpacing: '0.05em' 
-              }}>
-                Access Role
-              </th>
-              <th style={{ 
-                padding: '1rem 2rem', 
-                color: 'var(--text-muted)', 
-                fontWeight: '700', 
-                fontSize: '0.75rem', 
-                textTransform: 'uppercase', 
-                letterSpacing: '0.05em' 
-              }}>
-                Account Status
-              </th>
-              <th style={{ padding: '1rem 2rem', textAlign: 'right' }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u, i) => {
-              const getRoleStyles = (role) => {
-                const styles = {
-                  'Admin': { bg: '#0f172a15', text: '#0f172a', border: '#0f172a30' },
-                  'Project Manager': { bg: '#10b98115', text: '#10b981', border: '#10b98130' },
-                  'Designer': { bg: '#db277715', text: '#db2777', border: '#db277730' },
-                  'Installer': { bg: '#f59e0b15', text: '#f59e0b', border: '#f59e0b30' },
-                  'Accounting': { bg: '#6366f115', text: '#6366f1', border: '#6366f130' },
-                  'Customer': { bg: '#2563eb15', text: '#2563eb', border: '#2563eb30' }
+        <div className="scroll-container">
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem', minWidth: '800px' }}>
+            <thead>
+              <tr style={{ textAlign: 'left', background: 'var(--bg-dark)', borderBottom: '1px solid var(--border)' }}>
+                <th style={{ 
+                  padding: '1rem 1.5rem', 
+                  color: 'var(--text-muted)', 
+                  fontWeight: '800', 
+                  fontSize: '0.6875rem', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.05em' 
+                }}>
+                  Member Details
+                </th>
+                <th style={{ 
+                  padding: '1rem 1.5rem', 
+                  color: 'var(--text-muted)', 
+                  fontWeight: '800', 
+                  fontSize: '0.6875rem', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.05em' 
+                }}>
+                  Access Role
+                </th>
+                <th style={{ 
+                  padding: '1rem 1.5rem', 
+                  color: 'var(--text-muted)', 
+                  fontWeight: '800', 
+                  fontSize: '0.6875rem', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.05em' 
+                }}>
+                  Account Status
+                </th>
+                <th style={{ padding: '1rem 1.5rem', textAlign: 'right' }}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u, i) => {
+                const getRoleStyles = (role) => {
+                  const styles = {
+                    'Admin': { bg: '#0f172a15', text: '#0f172a', border: '#0f172a30' },
+                    'Project Manager': { bg: '#10b98115', text: '#10b981', border: '#10b98130' },
+                    'Designer': { bg: '#db277715', text: '#db2777', border: '#db277730' },
+                    'Installer': { bg: '#f59e0b15', text: '#f59e0b', border: '#f59e0b30' },
+                    'Accounting': { bg: '#6366f115', text: '#6366f1', border: '#6366f130' },
+                    'Customer': { bg: '#2563eb15', text: '#2563eb', border: '#2563eb30' }
+                  };
+                  return styles[role] || { bg: '#64748b15', text: '#64748b', border: '#64748b30' };
                 };
-                return styles[role] || { bg: '#64748b15', text: '#64748b', border: '#64748b30' };
-              };
-              const styles = getRoleStyles(u?.role);
+                const styles = getRoleStyles(u?.role);
 
-              return (
-                <tr 
-                  key={i} 
-                  style={{ 
-                    borderBottom: i === users.length - 1 ? 'none' : '1px solid var(--border)', 
-                    transition: 'background 0.2s' 
-                  }} 
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.01)'} 
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                >
-                  <td style={{ padding: '1.25rem 2rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      <div style={{ 
-                        width: '44px', 
-                        height: '44px', 
-                        borderRadius: '12px', 
+                return (
+                  <tr 
+                    key={i} 
+                    style={{ 
+                      borderBottom: i === users.length - 1 ? 'none' : '1px solid var(--border)', 
+                      transition: 'background 0.2s' 
+                    }} 
+                  >
+                    <td style={{ padding: '1rem 1.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ 
+                          width: '40px', 
+                          height: '40px', 
+                          borderRadius: '10px', 
+                          background: styles.bg, 
+                          color: styles.text,
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          fontWeight: '800',
+                          fontSize: '0.9375rem',
+                          border: `1px solid ${styles.border}`
+                        }}>
+                          {u?.name?.charAt(0)}
+                        </div>
+                        <div>
+                          <p style={{ fontWeight: '700', fontSize: '0.875rem', marginBottom: '0.125rem' }}>
+                            {u?.name}
+                          </p>
+                          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                            {u?.email}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: '1rem 1.5rem' }}>
+                      <span style={{ 
+                        fontSize: '0.625rem', 
+                        padding: '0.4rem 0.8rem', 
+                        borderRadius: '8px', 
                         background: styles.bg, 
                         color: styles.text,
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
                         fontWeight: '800',
-                        fontSize: '1rem',
-                        border: `1px solid ${styles.border}`
+                        border: `1px solid ${styles.border}`,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        textTransform: 'uppercase'
                       }}>
-                        {u?.name?.charAt(0)}
-                      </div>
-                      <div>
-                        <p style={{ fontWeight: '700', fontSize: '0.9375rem', marginBottom: '0.125rem' }}>
-                          {u?.name}
-                        </p>
-                        <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
-                          {u?.email}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{ padding: '1.25rem 2rem' }}>
-                    <span style={{ 
-                      fontSize: '0.6875rem', 
-                      padding: '0.4rem 0.8rem', 
-                      borderRadius: '8px', 
-                      background: styles.bg, 
-                      color: styles.text,
-                      fontWeight: '800',
-                      border: `1px solid ${styles.border}`,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      textTransform: 'uppercase'
-                    }}>
-                      <Shield size={12} />
-                      {u?.role}
-                    </span>
-                  </td>
-                  <td style={{ padding: '1.25rem 2rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></div>
-                      <span style={{ fontSize: '0.8125rem', fontWeight: '600', color: '#10b981' }}>
-                        Active Account
+                        <Shield size={12} />
+                        {u?.role}
                       </span>
-                    </div>
-                  </td>
-                  <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
-                    <button 
-                      style={{ 
-                        background: 'transparent', 
-                        border: 'none', 
-                        color: 'var(--text-muted)', 
-                        cursor: 'pointer', 
-                        padding: '0.5rem', 
-                        borderRadius: '8px' 
-                      }} 
-                      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-dark)'} 
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <MoreVertical size={20} />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    </td>
+                    <td style={{ padding: '1rem 1.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></div>
+                        <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#10b981' }}>
+                          Active
+                        </span>
+                      </div>
+                    </td>
+                    <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
+                      <button 
+                        style={{ 
+                          background: 'transparent', 
+                          border: 'none', 
+                          color: 'var(--text-muted)', 
+                          cursor: 'pointer', 
+                          padding: '0.5rem', 
+                          borderRadius: '8px' 
+                        }} 
+                      >
+                        <MoreVertical size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </Card>
 
       {/* Add User Modal */}

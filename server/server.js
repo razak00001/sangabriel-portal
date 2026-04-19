@@ -38,7 +38,7 @@ app.get('/health', (req, res) => res.status(200).send('OK'));
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [process.env.FRONTEND_URL, 'http://localhost:3000', 'https://sangabrielportal.varnyx.tech'].filter(Boolean),
   credentials: true
 }));
 app.use(express.json());

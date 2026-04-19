@@ -8,5 +8,6 @@ router.use(auth);
 router.get('/stats', dashboardController.getStats);
 router.get('/activity', dashboardController.getRecentActivity);
 router.get('/recent-projects', dashboardController.getRecentProjects);
+router.get('/archive-requests', dashboardController.getArchiveRequests);
 
 module.exports = router;

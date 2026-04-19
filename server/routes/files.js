@@ -37,7 +37,10 @@ if (process.env.S3_BUCKET_NAME) {
   });
 }
 
-const upload = multer({ storage });
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 } // 50MB
+});
 
 router.post('/upload', auth, upload.single('file'), fileController.uploadFile);
 router.get('/project/:projectId', auth, fileController.getProjectFiles);

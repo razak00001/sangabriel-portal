@@ -58,3 +58,23 @@ exports.getMe = asyncHandler(async (req, res, next) => {
     user: req.user
   });
 });
+// @desc    Register a new customer (Internal use by PM/Admin)
+exports.registerExternalCustomer = async ({ name, email, phone }) => {
+  // Generate temporary password
+  const tempPassword = Math.random().toString(36).slice(-8);
+  
+  const user = new User({ 
+    name, 
+    email, 
+    phone, 
+    password: tempPassword, 
+    role: 'Customer' 
+  });
+  
+  await user.save();
+  
+  // Send Welcome Email with credentials
+  sendWelcomeEmail(user, tempPassword).catch(err => console.error('Auto-registration email failed:', err));
+  
+  return user;
+};

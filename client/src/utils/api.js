@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://sangabriel-portal.onrender.com/api';
+
 const api = axios.create({
-  baseURL: 'https://sangabriel-portal.onrender.com/api',
+  baseURL,
 });
 
 // Add interceptor for Authorization header

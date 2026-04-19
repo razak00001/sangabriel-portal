@@ -28,6 +28,12 @@ exports.uploadFile = asyncHandler(async (req, res, next) => {
 
   const { projectId, tag } = req.body;
 
+  // Phase 4: File Versioning logic
+  const lastVersion = await File.findOne({ 
+    projectId, 
+    originalName: req.file.originalname 
+  }).sort({ version: -1 });
+
   const file = new File({
     originalName: req.file.originalname,
     fileName: req.file.key,
@@ -37,15 +43,54 @@ exports.uploadFile = asyncHandler(async (req, res, next) => {
     mimeType: req.file.mimetype,
     projectId,
     uploadedBy: req.user._id,
-    tag: tag || 'Document'
+    tag: tag || 'Document',
+    version: lastVersion ? lastVersion.version + 1 : 1,
+    parentFileId: lastVersion ? (lastVersion.parentFileId || lastVersion._id) : null
   });
 
   await file.save();
 
-  // Add file to project's files array (optional, dependining on if you want it tracked in Project model too)
-  await Project.findByIdAndUpdate(projectId, {
-    $push: { files: file._id }
-  });
+  await file.save();
+  
+  const project = await Project.findById(projectId);
+  if (project) {
+    let statusChanged = false;
+    const oldStatus = project.status;
+    let transitionReason = '';
+
+    // Phase 1 Automation: ACTIVE -> IN PROGRESS on Designer upload
+    if (project.status === 'ACTIVE' && req.user.role === 'Designer') {
+      project.status = 'IN PROGRESS';
+      statusChanged = true;
+      transitionReason = 'First Designer File Upload';
+    }
+
+    // Phase 1 Automation: Any -> PENDING REVIEW on "Delivery" tag upload
+    if (tag === 'Delivery' && project.status !== 'PENDING REVIEW') {
+      project.status = 'PENDING REVIEW';
+      statusChanged = true;
+      transitionReason = 'Production Delivery Uploaded';
+    }
+
+    if (statusChanged) {
+      await project.save();
+      const ActivityLog = require('../models/ActivityLog');
+      await ActivityLog.create({
+        projectId,
+        user: req.user._id,
+        action: 'Status Updated',
+        details: { from: oldStatus, to: project.status, trigger: transitionReason }
+      });
+      
+      if (global.io) {
+        global.io.to(projectId.toString()).emit('projectUpdated', project);
+      }
+    }
+
+    // Add file to project's files array
+    project.files.push(file._id);
+    await project.save();
+  }
 
   res.status(201).json({
     success: true,

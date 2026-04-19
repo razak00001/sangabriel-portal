@@ -40,26 +40,36 @@ export default function EventsAdminPage() {
   }
 
   return (
-    <div className="fade-in" style={{ padding: '2rem' }}>
-      <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Events Page Management</h1>
-      <p style={{ color: '#aaa', marginBottom: '2rem' }}>
-        Configure the dynamic image grids for the Events page. Add, remove, resize, and upload photos.
-      </p>
+    <div className="fade-in">
+      <header className="mobile-header-stack" style={{ marginBottom: '2.5rem' }}>
+        <div>
+          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>Events Management</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.8125rem' }}>Configure the dynamic image grids for the public Events page.</p>
+        </div>
+      </header>
 
       {error && (
-        <div style={{ padding: '1rem', backgroundColor: 'rgba(255,0,0,0.1)', color: '#ff4444', marginBottom: '1rem', borderRadius: '8px' }}>
+        <div style={{ padding: '0.75rem 1rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', marginBottom: '2rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '0.8125rem' }}>
           {error}
         </div>
       )}
 
       <div style={{ marginBottom: '4rem' }}>
-        <h2 style={{ fontSize: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', fontWeight: '800' }}>MOMENTS WE'VE SHARED</h2>
-        <GridBuilder sectionName="moments" initialLayout={momentsLayout} />
+        <h2 style={{ fontSize: '1.125rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', fontWeight: '800', marginBottom: '2rem' }}>MOMENTS WE'VE SHARED</h2>
+        <div className="scroll-container" style={{ padding: '1rem', background: 'var(--bg-dark)', borderRadius: '16px', border: '1px solid var(--border)' }}>
+          <div style={{ minWidth: '800px' }}>
+            <GridBuilder sectionName="moments" initialLayout={momentsLayout} />
+          </div>
+        </div>
       </div>
 
       <div>
-        <h2 style={{ fontSize: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', fontWeight: '800' }}>JOIN THE CONVERSATION</h2>
-        <GridBuilder sectionName="conversation" initialLayout={conversationLayout} />
+        <h2 style={{ fontSize: '1.125rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', fontWeight: '800', marginBottom: '2rem' }}>JOIN THE CONVERSATION</h2>
+        <div className="scroll-container" style={{ padding: '1rem', background: 'var(--bg-dark)', borderRadius: '16px', border: '1px solid var(--border)' }}>
+          <div style={{ minWidth: '800px' }}>
+            <GridBuilder sectionName="conversation" initialLayout={conversationLayout} />
+          </div>
+        </div>
       </div>
     </div>
   );

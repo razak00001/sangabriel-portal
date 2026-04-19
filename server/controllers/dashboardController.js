@@ -62,3 +62,19 @@ exports.getRecentActivity = asyncHandler(async (req, res, next) => {
     data: logs
   });
 });
+
+// @desc    Get pending archive requests
+// @route   GET /api/dashboard/archive-requests
+// @access  Private/Admin
+exports.getArchiveRequests = asyncHandler(async (req, res, next) => {
+  const ArchiveRequest = require('../models/ArchiveRequest');
+  const requests = await ArchiveRequest.find({ status: 'PENDING' })
+    .sort({ createdAt: -1 })
+    .populate('requestedBy', 'name')
+    .populate('projectId', 'title');
+
+  res.status(200).json({
+    success: true,
+    data: requests
+  });
+});

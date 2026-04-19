@@ -24,6 +24,18 @@ const initSocket = (server) => {
       }
     });
 
+    socket.on('typingStart', ({ projectId, userName }) => {
+      socket.to(projectId).emit('userTyping', { userName, isTyping: true });
+    });
+
+    socket.on('typingStop', ({ projectId, userName }) => {
+      socket.to(projectId).emit('userTyping', { userName, isTyping: false });
+    });
+
+    socket.on('messageRead', ({ projectId, userId }) => {
+      io.to(projectId).emit('readReceipt', { userId, readAt: new Date() });
+    });
+
     socket.on('disconnect', () => {
       console.log('Client disconnected');
     });

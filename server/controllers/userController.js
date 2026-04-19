@@ -1,27 +1,33 @@
-const User = require('../models/User');
-const asyncHandler = require('../utils/asyncHandler');
-const ErrorResponse = require('../utils/errorResponse');
-
-// @desc    Get all users
-// @route   GET /api/users
-// @access  Private/Admin
-exports.getUsers = asyncHandler(async (req, res, next) => {
-  const users = await User.find().select('-password');
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
+exports.updateProfile = asyncHandler(async (req, res, next) => {
+  const { name, email, phone } = req.body;
   
-  res.status(200).json({
-    success: true,
-    data: users
-  });
+  const user = await User.findById(req.user._id);
+  if (!user) return next(new ErrorResponse('User not found', 404));
+
+  user.name = name || user.name;
+  user.email = email || user.email;
+  user.phone = phone || user.phone;
+
+  await user.save();
+  res.status(200).json({ success: true, data: user });
 });
 
-// @desc    Get users by role
-// @route   GET /api/users/role/:role
+// @desc    Change password
+// @route   PUT /api/users/change-password
 // @access  Private
-exports.getUsersByRole = asyncHandler(async (req, res, next) => {
-  const users = await User.find({ role: req.params.role }).select('name email role status');
+exports.changePassword = asyncHandler(async (req, res, next) => {
+  const { oldPassword, newPassword } = req.body;
   
-  res.status(200).json({
-    success: true,
-    data: users
-  });
+  const user = await User.findById(req.user._id);
+  if (!user || !(await user.comparePassword(oldPassword))) {
+    return next(new ErrorResponse('Invalid current password', 400));
+  }
+
+  user.password = newPassword;
+  await user.save();
+  
+  res.status(200).json({ success: true, message: 'Password updated successfully' });
 });
