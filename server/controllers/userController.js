@@ -1,3 +1,7 @@
+const asyncHandler = require('../utils/asyncHandler');
+const ErrorResponse = require('../utils/errorResponse');
+const User = require('../models/User');
+
 // @desc    Update user profile
 // @route   PUT /api/users/profile
 // @access  Private

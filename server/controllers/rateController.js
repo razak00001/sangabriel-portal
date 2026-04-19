@@ -1,3 +1,7 @@
+const asyncHandler = require('../utils/asyncHandler');
+const ErrorResponse = require('../utils/errorResponse');
+const RateConfig = require('../models/RateConfig');
+
 // @desc    Get current active rates
 // @route   GET /api/rates
 // @access  Private
@@ -9,6 +13,9 @@ exports.getRates = asyncHandler(async (req, res, next) => {
     data: rates
   });
 });
+
+const asyncHandler = require('../utils/asyncHandler');
+const ErrorResponse = require('../utils/errorResponse');
 
 // @desc    Update rates (Create new version)
 // @route   POST /api/rates
