@@ -15,7 +15,7 @@ export default function DashboardLayout({ children }) {
     // Only redirect if we are CERTAIN the user is not logged in
     // i.e., loading is finished AND user is null
     if (!loading && !user) {
-      router.push('/');
+      router.push('/login');
     }
   }, [user, loading, router]);
 

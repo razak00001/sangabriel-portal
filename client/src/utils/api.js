@@ -25,7 +25,7 @@ api.interceptors.response.use(
         localStorage.removeItem('token');
         // Force a page refresh to clear state and redirect to login
         // This is the most robust way to ensure all stale sensitive data is wiped
-        window.location.href = '/?expired=true';
+        window.location.href = '/login?expired=true';
       }
     }
     return Promise.reject(error);
