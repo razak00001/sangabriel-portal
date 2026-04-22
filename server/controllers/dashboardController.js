@@ -3,14 +3,21 @@ const ActivityLog = require('../models/ActivityLog');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
+// Common logic for role-based project query
+const getProjectQueryByRole = (user) => {
+  if (user.role === 'Admin') return {};
+  if (user.role === 'Project Manager') return { projectManager: user._id };
+  if (user.role === 'Designer') return { designer: user._id };
+  if (user.role === 'Installer') return { installer: user._id };
+  if (user.role === 'Customer') return { teamMembers: user._id };
+  return { _id: null }; // Default to nothing if role unknown
+};
+
 // @desc    Get dashboard stats
 // @route   GET /api/dashboard/stats
 // @access  Private
 exports.getStats = asyncHandler(async (req, res, next) => {
-  const query = {};
-  if (req.user.role !== 'Admin') {
-    // Basic role filtering if necessary, or just return global stats for now
-  }
+  const query = getProjectQueryByRole(req.user);
 
   const [total, active, complete, billed] = await Promise.all([
     Project.countDocuments(query),
@@ -36,7 +43,9 @@ exports.getStats = asyncHandler(async (req, res, next) => {
 // @route   GET /api/dashboard/recent-projects
 // @access  Private
 exports.getRecentProjects = asyncHandler(async (req, res, next) => {
-  const projects = await Project.find()
+  const query = getProjectQueryByRole(req.user);
+  
+  const projects = await Project.find(query)
     .sort({ updatedAt: -1 })
     .limit(5)
     .populate('projectManager designer');
@@ -46,6 +55,7 @@ exports.getRecentProjects = asyncHandler(async (req, res, next) => {
     data: projects
   });
 });
+
 
 // @desc    Get recent activity
 // @route   GET /api/dashboard/activity

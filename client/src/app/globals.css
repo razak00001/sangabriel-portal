@@ -1,14 +1,19 @@
 :root {
   /* Core Colors - San Gabriel Brand */
   --primary: #4f46e5;
+  --primary-hover: #4338ca;
   --primary-glow: rgba(79, 70, 229, 0.4);
   --secondary: #1e1b4b;
   --accent: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --success: #10b981;
   
   /* Backgrounds */
   --bg-main: #f8fafc;
   --bg-card: #ffffff;
-  --bg-sidebar: #0f172a; /* Deep Slate Navy */
+  --bg-dark: rgba(0, 0, 0, 0.03);
+  --bg-sidebar: #0f172a;
   --bg-sidebar-hover: rgba(255, 255, 255, 0.05);
   
   /* Text */
@@ -18,7 +23,8 @@
   --text-white: #ffffff;
   
   /* Borders & Spacing */
-  --border-light: #e2e8f0;
+  --border: #e2e8f0;
+  --border-light: rgba(226, 232, 240, 0.5);
   --border-sidebar: rgba(255, 255, 255, 0.08);
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -27,9 +33,9 @@
   
   /* Effects */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 /* Base resets */
@@ -47,15 +53,60 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Premium Typography */
-h1 { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em; }
-h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
-h3 { font-size: 1.125rem; font-weight: 700; }
+/* --- Utility Classes --- */
+
+/* Flexbox */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-1 { flex: 1; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+.gap-8 { gap: 2rem; }
+
+/* Spacing */
+.p-2 { padding: 0.5rem; }
+.p-4 { padding: 1rem; }
+.p-6 { padding: 1.5rem; }
+.p-8 { padding: 2rem; }
+.m-0 { margin: 0; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mt-auto { margin-top: auto; }
+
+/* Sizing */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.size-8 { width: 2rem; height: 2rem; }
+.size-10 { width: 2.5rem; height: 2.5rem; }
+.size-12 { width: 3rem; height: 3rem; }
+
+/* Text */
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.font-bold { font-weight: 700; }
+.font-black { font-weight: 900; }
+.uppercase { text-transform: uppercase; }
+.tracking-tight { letter-spacing: -0.025em; }
+.tracking-wider { letter-spacing: 0.05em; }
+.text-muted { color: var(--text-muted); }
+.text-white { color: var(--text-white); }
+.text-center { text-align: center; }
 
 /* Layout Components */
 .main-content {
   padding: 2rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100vh;
 }
 
 @media (min-width: 1024px) {
@@ -68,18 +119,19 @@ h3 { font-size: 1.125rem; font-weight: 700; }
 /* Card System */
 .glass {
   background: var(--bg-card);
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
+  overflow: hidden;
 }
 
-.glass:hover {
+.card-hover:hover {
   box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
 }
 
-/* Sidebar Styles (moved from inline) */
+/* Sidebar Styles */
 .sidebar-container {
   width: 280px;
   height: 100vh;
@@ -108,6 +160,7 @@ h3 { font-size: 1.125rem; font-weight: 700; }
   transition: all 0.2s ease;
   cursor: pointer;
   border: 1px solid transparent;
+  user-select: none;
 }
 
 .nav-item:hover {
@@ -123,32 +176,76 @@ h3 { font-size: 1.125rem; font-weight: 700; }
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Scrollbar customization */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 20px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+/* Professional Table System */
+.table-container {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
 
-/* Mobile optimizations */
-@media (max-width: 1023px) {
-  .sidebar-container {
-    transform: translateX(-100%);
-  }
-  .sidebar-container.open {
-    transform: translateX(0);
-  }
-  .main-content {
-    margin-top: 64px;
-    padding: 1.5rem;
+.table-row:hover {
+  background: var(--bg-main);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px var(--primary-glow);
+}
+
+.btn-secondary {
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* Grids */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 1200px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -160,6 +257,19 @@ h3 { font-size: 1.125rem; font-weight: 700; }
 
 .fade-in {
   animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Skeleton Loaders */
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* Mesh Gradient Background */
@@ -177,3 +287,4 @@ h3 { font-size: 1.125rem; font-weight: 700; }
     radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
     radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
 }
+

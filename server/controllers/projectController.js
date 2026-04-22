@@ -40,28 +40,26 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   });
 });
 
+// Common logic for role-based project query
+const getProjectQueryByRole = (user) => {
+  if (user.role === 'Admin') return {};
+  if (user.role === 'Project Manager') return { projectManager: user._id };
+  if (user.role === 'Designer') return { designer: user._id };
+  if (user.role === 'Installer') return { installer: user._id };
+  if (user.role === 'Customer') return { teamMembers: user._id };
+  return { _id: null };
+};
+
 // @desc    Get all projects
 // @route   GET /api/projects
 // @access  Private
 exports.getProjects = asyncHandler(async (req, res, next) => {
-  let query = {};
-  
-  // Role-based filtering
-  if (req.user.role === 'Admin') {
-    query = {};
-  } else if (req.user.role === 'Project Manager') {
-    query = { projectManager: req.user._id };
-  } else if (req.user.role === 'Designer') {
-    query = { designer: req.user._id };
-  } else if (req.user.role === 'Installer') {
-    query = { installer: req.user._id };
-  } else if (req.user.role === 'Customer') {
-    query = { teamMembers: req.user._id };
-  }
+  const query = getProjectQueryByRole(req.user);
 
   const projects = await Project.find(query)
     .populate('projectManager designer installer teamMembers')
     .sort({ createdAt: -1 });
+
 
   res.status(200).json({
     success: true,
