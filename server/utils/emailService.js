@@ -1,7 +1,6 @@
 const sgMail = require('@sendgrid/mail');
-const ErrorResponse = require('./errorResponse');
 
-// Set API Key
+// Set API Key from environment variable
 if (process.env.SENDGRID_API_KEY) {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 }
@@ -16,6 +15,9 @@ const sendEmail = async ({ to, subject, text, html }) => {
     return false;
   }
 
+  // Ensure API Key is set (in case it wasn't set at module load time)
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
   const msg = {
     to,
     from: process.env.SENDGRID_FROM_EMAIL || 'no-reply@sangabrielsolutions.com',
@@ -28,8 +30,8 @@ const sendEmail = async ({ to, subject, text, html }) => {
     await sgMail.send(msg);
     return true;
   } catch (error) {
-    console.error('SendGrid Error:', error.response ? error.response.body : error.message);
-    // We don't throw here to avoid crashing the main request flow (e.g., registration)
+    const errorMsg = error.response ? error.response.body : error.message;
+    console.error('SendGrid Error:', JSON.stringify(errorMsg, null, 2));
     return false;
   }
 };

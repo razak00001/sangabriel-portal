@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * UserForm Component
+ * A standardized form for creating and editing platform members.
+ */
 import { User, Mail, Lock, Shield } from 'lucide-react';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
@@ -34,7 +38,7 @@ export default function UserForm({ onSubmit, onCancel, initialValues = {} }) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, validate)}>
+    <form onSubmit={handleSubmit(onSubmit, validate)} className="space-y-2">
       <Input
         label="Full Name"
         name="name"
@@ -77,24 +81,24 @@ export default function UserForm({ onSubmit, onCancel, initialValues = {} }) {
         icon={Shield}
       />
 
-      <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+      <footer className="flex gap-4 mt-8 pt-6 border-t border-border">
         <Button 
           type="button"
           variant="secondary"
           onClick={onCancel}
-          fullWidth
+          className="flex-1"
         >
           Cancel
         </Button>
         <Button 
           type="submit"
           variant="primary"
-          disabled={isSubmitting}
-          fullWidth
+          loading={isSubmitting}
+          className="flex-1"
         >
-          {isSubmitting ? 'Creating...' : 'Create User'}
+          {initialValues.id ? 'Save Changes' : 'Create Member'}
         </Button>
-      </div>
+      </footer>
     </form>
   );
 }
