@@ -109,3 +109,44 @@ exports.getWorkloadDistribution = asyncHandler(async (req, res, next) => {
     data: distribution
   });
 });
+// @desc    Get job volume report (total projects over time)
+// @route   GET /api/reports/job-volume
+// @access  Private/Admin
+exports.getJobVolume = asyncHandler(async (req, res, next) => {
+  const volume = await Project.aggregate([
+    {
+      $group: {
+        _id: {
+          year: { $year: "$createdAt" },
+          month: { $month: "$createdAt" }
+        },
+        count: { $sum: 1 }
+      }
+    },
+    { $sort: { "_id.year": -1, "_id.month": -1 } }
+  ]);
+
+  res.status(200).json({
+    success: true,
+    data: volume
+  });
+});
+
+// @desc    Get project status distribution
+// @route   GET /api/reports/status-distribution
+// @access  Private/Admin
+exports.getStatusDistribution = asyncHandler(async (req, res, next) => {
+  const distribution = await Project.aggregate([
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 }
+      }
+    }
+  ]);
+
+  res.status(200).json({
+    success: true,
+    data: distribution
+  });
+});

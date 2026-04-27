@@ -12,7 +12,8 @@ import {
   BarChart3,
   Bell,
   Calendar,
-  ChevronRight
+  ChevronRight,
+  X
 } from 'lucide-react';
 import api from '../utils/api';
 
@@ -58,40 +59,53 @@ export default function Sidebar({ isOpen, onClose }) {
 
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Mobile Overlay - Strictly for mobile */}
       <div 
         onClick={onClose}
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[900] transition-all duration-300 ${
+        className={`mobile-only fixed inset-0 bg-black/60 backdrop-blur-sm z-[900] transition-all duration-300 ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       />
 
       <aside className={`sidebar-container ${isOpen ? 'open' : ''}`}>
         {/* Header Section */}
-        <div className="mb-12 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/40">
-              <FolderKanban size={20} color="#ffffff" />
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/40">
+                <FolderKanban size={20} color="#ffffff" />
+              </div>
+              <div>
+                <h2 className="text-sm font-black m-0 tracking-wider text-white uppercase">
+                  SAN GABRIEL
+                </h2>
+                <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest m-0">
+                  Solutions Portal
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-sm font-black m-0 tracking-wider text-white uppercase">
-                SAN GABRIEL
-              </h2>
-              <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest m-0">
-                Solutions Portal
-              </p>
-            </div>
+            
+            {/* Mobile Close Button - Strictly for mobile */}
+            <button 
+              onClick={onClose}
+              className="mobile-only p-2 rounded-xl bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition-all border-none cursor-pointer"
+            >
+              <X size={20} />
+            </button>
           </div>
-          
-          <button 
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="p-2 rounded-lg bg-white/5 border-none text-white/60 cursor-pointer relative hover:bg-white/10 transition-colors"
-          >
-            <Bell size={18} />
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-0 size-1.5 bg-red-500 rounded-full" />
-            )}
-          </button>
+
+          <div className="flex justify-between items-center px-2 py-3 bg-white/5 rounded-2xl border border-white/10">
+            <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-2">Quick Actions</span>
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="p-2 rounded-lg bg-white/5 border-none text-white/60 cursor-pointer relative hover:bg-white/10 transition-colors"
+            >
+              <Bell size={18} />
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 size-1.5 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Navigation Items */}

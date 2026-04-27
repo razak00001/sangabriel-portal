@@ -10,5 +10,7 @@ router.get('/profitability/:projectId', authorize('Admin'), reportController.get
 router.get('/performance', authorize('Admin'), reportController.getGlobalPerformance);
 router.get('/revenue', authorize('Admin', 'Accounting'), reportController.getRevenueReport);
 router.get('/workload', authorize('Admin'), reportController.getWorkloadDistribution);
+router.get('/job-volume', authorize('Admin', 'Accounting'), reportController.getJobVolume);
+router.get('/status-distribution', authorize('Admin', 'Accounting'), reportController.getStatusDistribution);
 
 module.exports = router;

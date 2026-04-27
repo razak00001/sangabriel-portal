@@ -42,28 +42,28 @@ export default function LoginPage() {
       {/* Premium Background */}
       <div className="mesh-gradient" />
       
-      <div className="glass w-full max-w-[440px] p-10 fade-in border border-white/20 shadow-premium">
+      <div className="login-card fade-in relative z-10">
         <header className="text-center mb-10">
-          {/* Logo Branding */}
-          <div className="flex justify-center mb-6">
-            <div className="size-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-              <LogIn size={32} className="text-white" />
+          <div className="flex justify-center mb-8">
+            <div className="size-20 rounded-[28px] bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center shadow-2xl shadow-indigo-500/40 transform -rotate-3 hover:rotate-0 transition-transform duration-500">
+              <LogIn size={40} className="text-white" strokeWidth={2.5} />
             </div>
           </div>
           
-          <h1 className="text-3xl font-black mb-2 tracking-tight">Welcome Back</h1>
-          <p className="text-muted text-sm font-bold uppercase tracking-wider">
+          <h1 className="text-4xl font-black mb-3 tracking-tighter text-secondary">San Gabriel</h1>
+          <p className="text-muted text-[10px] font-black uppercase tracking-[0.2em]">
             Collaboration Portal
           </p>
         </header>
 
         {error && (
-          <div className="flex items-center gap-3 p-4 bg-danger/10 border border-danger/20 text-danger rounded-xl mb-8 text-sm font-black animate-fadeIn">
+          <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl mb-8 text-xs font-bold animate-fadeIn">
+            <span className="size-2 bg-red-500 rounded-full animate-pulse" />
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-2">
+        <form onSubmit={handleLogin} className="flex flex-col gap-6">
           <Input 
             label="Email Address"
             type="email" 
@@ -89,17 +89,17 @@ export default function LoginPage() {
           <Button 
             type="submit" 
             variant="primary" 
-            className="w-full mt-4 h-12"
+            className="w-full h-14 text-sm tracking-widest mt-4 shadow-xl"
             loading={submitting}
           >
-            SIGN IN
+            SIGN IN TO PORTAL
           </Button>
         </form>
 
-        <footer className="mt-10 pt-10 border-t border-border text-center">
-          <p className="text-muted text-xs font-bold uppercase tracking-widest">
-            Don't have an account? 
-            <a href="#" className="ml-2 text-primary hover:underline transition-all">Contact Admin</a>
+        <footer className="mt-12 pt-8 border-t border-border/60 text-center">
+          <p className="text-muted text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+            Trouble logging in? <br/>
+            <a href="#" className="mt-2 inline-block text-primary hover:underline transition-all">Contact System Administrator</a>
           </p>
         </footer>
       </div>

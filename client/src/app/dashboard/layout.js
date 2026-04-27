@@ -43,29 +43,25 @@ export default function DashboardLayout({ children }) {
       <div className="mesh-gradient"></div>
 
       {/* Mobile Header */}
-      <header className="show-mobile" style={{ 
-        position: 'fixed', 
-        top: 0, 
-        left: 0, 
-        right: 0, 
-        height: '64px', 
-        display: 'flex', 
-        alignItems: 'center', 
-        padding: '0 1.25rem',
-        zIndex: 500,
-        background: 'rgba(255,255,255,0.8)',
-        backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid #e2e8f0'
-      }}>
-        <button 
-          onClick={() => setIsSidebarOpen(true)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0f172a' }}
-        >
-          <Menu size={24} />
-        </button>
-        <span style={{ marginLeft: '1rem', fontWeight: '900', fontSize: '1rem', color: '#0f172a', letterSpacing: '0.05em' }}>
-          SAN GABRIEL
-        </span>
+      <header className="mobile-header">
+        <div className="flex items-center gap-4 w-full">
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
+            className="flex items-center justify-center size-12 rounded-2xl bg-white/80 backdrop-blur-md shadow-sm border border-white/40 cursor-pointer text-secondary active:scale-90 transition-all duration-200"
+            aria-label="Open menu"
+          >
+            <Menu size={24} strokeWidth={2.5} />
+          </button>
+          
+          <div className="flex flex-col">
+            <h2 className="font-black text-[13px] text-secondary tracking-[0.15em] uppercase leading-none m-0">
+              San Gabriel
+            </h2>
+            <span className="text-[9px] font-black text-primary/70 uppercase tracking-widest mt-1.5 m-0">
+              Solutions Portal
+            </span>
+          </div>
+        </div>
       </header>
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
