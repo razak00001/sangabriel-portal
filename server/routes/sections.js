@@ -63,6 +63,7 @@ router.post('/:section/save', auth, async (req, res) => {
 
     res.json({ message: 'Layout saved successfully' });
   } catch (error) {
+    console.error('SECTION SAVE ERROR:', error);
     res.status(500).json({ error: error.message });
   }
 });

@@ -3,14 +3,12 @@ const multer = require('multer');
 const multerS3 = require('multer-s3');
 const path = require('path');
 
-// Configure AWS with credentials
-AWS.config.update({
+// S3 Configuration (v2 compatibility)
+const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: process.env.AWS_REGION || 'us-east-1'
 });
-
-const s3 = new AWS.S3();
 
 // Filter for allowing only images
 const fileFilter = (req, file, cb) => {
