@@ -17,9 +17,9 @@ export default function ProjectCard({ project, onClick, className }) {
       hover 
       onClick={onClick}
       className={cn("group flex flex-col h-full", className)}
-      padding="p-8"
+      padding="p-6 sm:p-8"
     >
-      <div className="flex justify-between items-start mb-10">
+      <div className="flex justify-between items-start mb-6 sm:mb-10">
         <div 
           className="px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2.5 shadow-sm border border-transparent transition-all duration-500 group-hover:shadow-md"
           style={{ 
@@ -38,10 +38,10 @@ export default function ProjectCard({ project, onClick, className }) {
       </div>
 
       <div className="flex-1">
-        <h3 className="text-3xl font-black mb-2 text-gray-900 tracking-tight group-hover:text-indigo-600 transition-colors">
+        <h3 className="text-2xl sm:text-3xl font-black mb-2 text-gray-900 tracking-tight group-hover:text-indigo-600 transition-colors">
           {project.title}
         </h3>
-        <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-10">
+        <p className="text-[9px] sm:text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-6 sm:mb-10">
           {project.clientName || 'Strategic Account'}
         </p>
 

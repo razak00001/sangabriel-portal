@@ -17,10 +17,10 @@ export default function StatsCard({ name, value, icon: Icon, color, loading, tre
 
   if (loading) {
     return (
-      <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm relative overflow-hidden animate-pulse">
-        <div className="size-14 rounded-2xl bg-gray-100 mb-8" />
-        <div className="h-10 w-24 bg-gray-100 rounded-xl mb-3" />
-        <div className="h-4 w-32 bg-gray-100 rounded-lg" />
+      <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border border-gray-100 shadow-sm relative overflow-hidden animate-pulse">
+        <div className="size-10 sm:size-14 rounded-2xl bg-gray-100 mb-6 sm:mb-8" />
+        <div className="h-8 w-20 bg-gray-100 rounded-xl mb-3" />
+        <div className="h-4 w-24 bg-gray-100 rounded-lg" />
       </div>
     );
   }
@@ -33,13 +33,13 @@ export default function StatsCard({ name, value, icon: Icon, color, loading, tre
       "hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/5 hover:ring-1 hover:ring-gray-200",
       "relative overflow-hidden"
     )}>
-      <div className="flex justify-between items-start mb-10 relative z-10">
+      <div className="flex justify-between items-start mb-6 sm:mb-10 relative z-10">
         <div className={cn(
-          "size-16 rounded-2xl flex items-center justify-center transition-all duration-500",
+          "size-12 sm:size-16 rounded-2xl flex items-center justify-center transition-all duration-500",
           "transform group-hover:scale-110 group-hover:rotate-6 shadow-sm",
           c.bg, c.text
         )}>
-          {Icon && <Icon size={28} strokeWidth={2.5} />}
+          {Icon && <Icon size={24} className="sm:w-7 sm:h-7" strokeWidth={2.5} />}
         </div>
         
         {trend && (
@@ -53,10 +53,10 @@ export default function StatsCard({ name, value, icon: Icon, color, loading, tre
       </div>
       
       <div className="relative z-10">
-        <h3 className="text-4xl font-black text-gray-900 mb-2 tracking-tight group-hover:text-indigo-600 transition-colors">
+        <h3 className="text-2xl sm:text-4xl font-black text-gray-900 mb-2 tracking-tight group-hover:text-indigo-600 transition-colors">
           {value}
         </h3>
-        <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">
+        <p className="text-[9px] sm:text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">
           {name}
         </p>
       </div>

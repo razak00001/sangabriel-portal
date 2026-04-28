@@ -64,21 +64,22 @@ export default function DashboardPage() {
   return (
     <div className="fade-in max-w-[1600px] mx-auto">
       {/* Header Section */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-20 animate-slide-up">
-        <div className="space-y-4">
+      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 sm:gap-10 mb-12 sm:mb-20 animate-slide-up px-2 sm:px-0">
+        <div className="space-y-3 sm:space-y-4 w-full lg:w-auto">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
-              <Sparkles size={20} strokeWidth={2.5} />
+            <div className="size-8 sm:size-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
+              <Sparkles size={16} sm:size={20} strokeWidth={2.5} />
             </div>
-            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em]">Strategic Control Center</span>
+            <span className="text-[8px] sm:text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em]">Strategic Control Center</span>
           </div>
-          <h1 className="text-6xl font-black text-gray-900 tracking-tighter leading-none">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-gray-900 tracking-tighter leading-tight sm:leading-none">
             Welcome, {user?.name?.split(' ')[0] || 'Executive'}
-            <span className="text-gray-200 mx-6 font-thin">|</span>
+            <span className="hidden sm:inline text-gray-200 mx-4 lg:mx-6 font-thin">|</span>
+            <br className="sm:hidden" />
             <span className="text-indigo-600 drop-shadow-sm">{user?.role}</span>
           </h1>
-          <p className="text-gray-400 text-xl font-bold max-w-2xl leading-relaxed">
-            Your portfolio is currently operating at <span className="text-gray-900">optimal efficiency</span>. Here is the latest intelligence.
+          <p className="text-gray-400 text-sm sm:text-xl font-bold max-w-2xl leading-relaxed">
+            Your portfolio is currently operating at <span className="text-gray-900">optimal efficiency</span>.
           </p>
         </div>
         
@@ -117,19 +118,19 @@ export default function DashboardPage() {
 
       {/* Strategic Operational Heatmap */}
       {isAdmin && data.workload.length > 0 && (
-        <Card variant="glass" className="mb-12 group">
-           <div className="absolute top-0 right-0 p-12 text-gray-100 opacity-5 group-hover:opacity-20 transition-all duration-1000 scale-150">
-             <TrendingUp size={160} strokeWidth={3} />
+        <Card variant="glass" className="mb-12 group overflow-hidden" padding="p-6 sm:p-10">
+           <div className="absolute top-0 right-0 p-8 sm:p-12 text-gray-100 opacity-5 group-hover:opacity-20 transition-all duration-1000 scale-150">
+             <TrendingUp size={100} sm:size={160} strokeWidth={3} />
            </div>
            
-           <h2 className="text-[11px] font-black mb-14 flex items-center gap-4 uppercase tracking-[0.3em] text-gray-400">
-             <Zap size={18} className="text-indigo-600 fill-indigo-600/10" />
-             Portfolio Operational Load Distribution
+           <h2 className="text-[9px] sm:text-[11px] font-black mb-8 sm:mb-14 flex items-center gap-3 sm:gap-4 uppercase tracking-[0.3em] text-gray-400">
+             <Zap size={14} sm:size={18} className="text-indigo-600 fill-indigo-600/10" />
+             Portfolio Load Distribution
            </h2>
            
-           <div className="flex gap-10 h-48 items-end min-w-full overflow-x-auto custom-scrollbar pb-6">
+           <div className="flex gap-4 sm:gap-10 h-32 sm:h-48 items-end min-w-full overflow-x-auto custom-scrollbar pb-4 sm:pb-6">
               {data.workload.map((item, idx) => (
-                <div key={idx} className="flex-1 relative group/bar min-w-[100px]">
+                <div key={idx} className="flex-1 relative group/bar min-w-[80px] sm:min-w-[100px]">
                     <div 
                       className="bg-indigo-600 rounded-[1.5rem] opacity-90 mb-6 transition-all duration-1000 shadow-xl shadow-indigo-600/20 group-hover/bar:scale-x-105 group-hover/bar:opacity-100 group-hover/bar:bg-indigo-500"
                       style={{ 

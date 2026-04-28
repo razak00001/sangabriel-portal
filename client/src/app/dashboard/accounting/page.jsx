@@ -70,19 +70,19 @@ export default function AccountingDashboard() {
   return (
     <div className="fade-in max-w-[1600px] mx-auto pb-20">
       {/* Header Section */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-20 animate-slide-up">
-        <div className="space-y-4">
+      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 sm:gap-10 mb-12 sm:mb-20 animate-slide-up px-2 sm:px-0">
+        <div className="space-y-3 sm:space-y-4 w-full lg:w-auto">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-xl shadow-emerald-600/20">
-              <DollarSign size={20} strokeWidth={2.5} />
+            <div className="size-8 sm:size-10 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-xl shadow-emerald-600/20">
+              <DollarSign size={16} sm:size={20} strokeWidth={2.5} />
             </div>
-            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em]">Financial Oversight</span>
+            <span className="text-[8px] sm:text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em]">Financial Oversight</span>
           </div>
-          <h1 className="text-6xl font-black text-gray-900 tracking-tighter leading-none">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-gray-900 tracking-tighter leading-tight sm:leading-none">
             Fiscal <span className="text-emerald-600">Performance</span>
           </h1>
-          <p className="text-gray-400 text-xl font-bold max-w-2xl leading-relaxed">
-            Real-time revenue tracking and <span className="text-gray-900">automated billing management</span>.
+          <p className="text-gray-400 text-sm sm:text-xl font-bold max-w-2xl leading-relaxed">
+            Real-time revenue tracking and <span className="text-gray-900 font-black">automated billing</span>.
           </p>
         </div>
         
@@ -133,15 +133,15 @@ export default function AccountingDashboard() {
       {/* Advanced Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <Card variant="glass" className="lg:col-span-2 group">
-          <div className="flex justify-between items-center mb-14">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10 sm:mb-14">
              <div className="flex items-center gap-4">
                <div className="size-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-xl">
                  <TrendingUp size={20} strokeWidth={2.5} />
                </div>
-               <h2 className="text-sm font-black uppercase tracking-[0.25em] text-gray-900">Revenue Stream</h2>
+               <h2 className="text-xs sm:text-sm font-black uppercase tracking-[0.25em] text-gray-900">Revenue Stream</h2>
              </div>
-             <Link href="/dashboard/accounting/reports" className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] flex items-center gap-3 hover:gap-6 transition-all group/link">
-               Deep Analytics <ArrowUpRight size={16} strokeWidth={3} className="group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
+             <Link href="/dashboard/accounting/reports" className="text-[9px] sm:text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] flex items-center gap-3 hover:gap-6 transition-all group/link">
+               Deep Analytics <ArrowUpRight size={14} sm:size={16} strokeWidth={3} className="group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
              </Link>
           </div>
           

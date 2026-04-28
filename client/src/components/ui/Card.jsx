@@ -12,7 +12,7 @@ export default function Card({
   hover = false,
   variant = 'glass', // 'glass' | 'bento' | 'flat' | 'outline'
   animate = true,
-  padding = 'p-8',
+  padding = 'p-5 sm:p-10',
   ...props
 }) {
   return (

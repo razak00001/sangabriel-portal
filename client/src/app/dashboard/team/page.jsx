@@ -86,19 +86,19 @@ export default function TeamPage() {
   return (
     <div className="fade-in max-w-[1600px] mx-auto pb-20">
       {/* Header Section */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-20 animate-slide-up">
-        <div className="space-y-4">
+      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 sm:gap-10 mb-12 sm:mb-20 animate-slide-up px-2 sm:px-0">
+        <div className="space-y-3 sm:space-y-4 w-full lg:w-auto">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
-              <Users size={20} strokeWidth={2.5} />
+            <div className="size-8 sm:size-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
+              <Users size={16} sm:size={20} strokeWidth={2.5} />
             </div>
-            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em]">Organization Oversight</span>
+            <span className="text-[8px] sm:text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em]">Organization Oversight</span>
           </div>
-          <h1 className="text-6xl font-black text-gray-900 tracking-tighter leading-none">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-gray-900 tracking-tighter leading-tight sm:leading-none">
             Team <span className="text-indigo-600">Directory</span>
           </h1>
-          <p className="text-gray-400 text-xl font-bold max-w-2xl leading-relaxed">
-            Manage your organization's <span className="text-gray-900">human capital</span> and collaborative permissions.
+          <p className="text-gray-400 text-sm sm:text-xl font-bold max-w-2xl leading-relaxed">
+            Manage your organization's <span className="text-gray-900 font-black">human capital</span> and permissions.
           </p>
         </div>
         
@@ -140,18 +140,18 @@ export default function TeamPage() {
 
       {/* Main Directory Table */}
       <Card variant="glass" padding="p-0 overflow-hidden">
-        <div className="p-8 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gray-50/30">
+        <div className="p-6 sm:p-8 border-b border-gray-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-gray-50/30">
           <div>
-            <h3 className="text-sm font-black uppercase tracking-widest text-gray-900">Personnel Directory</h3>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Real-time status of all organizational nodes</p>
+            <h3 className="text-xs sm:text-sm font-black uppercase tracking-widest text-gray-900">Personnel Directory</h3>
+            <p className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Real-time status of all organizational nodes</p>
           </div>
-          <div className="relative min-w-[300px]">
+          <div className="relative w-full lg:min-w-[300px]">
             <Input 
-              placeholder="Filter by name, intelligence or role..." 
+              placeholder="Search by name, role..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               icon={Search}
-              className="bg-white"
+              className="bg-white shadow-sm"
             />
           </div>
         </div>

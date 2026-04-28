@@ -158,34 +158,32 @@ function WorkspaceInner() {
   return (
     <div className="fade-in max-w-7xl mx-auto pb-12">
       {/* Premium Header Area with Mesh Gradient */}
-      <div className="relative mb-10 p-8 sm:p-10 rounded-[2rem] overflow-hidden bg-white border border-indigo-50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] group">
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 blur-3xl rounded-full mix-blend-multiply opacity-70 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-gradient-to-tr from-emerald-500/10 to-teal-500/10 blur-3xl rounded-full mix-blend-multiply opacity-70 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+      <div className="relative mb-8 sm:mb-10 p-6 sm:p-10 rounded-[2rem] overflow-hidden bg-white border border-indigo-50 shadow-sm group">
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 blur-3xl rounded-full mix-blend-multiply opacity-70 pointer-events-none"></div>
         
-        <header className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-          <div className="flex-1">
-            <nav className="flex items-center gap-3 mb-6 text-[10px] font-black uppercase tracking-[0.2em]">
-              <span className="text-gray-400 flex items-center gap-2"><FolderKanban size={14} /> Projects</span>
+        <header className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 sm:gap-8">
+          <div className="flex-1 min-w-0">
+            <nav className="flex items-center gap-2 mb-4 sm:mb-6 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em]">
+              <span className="text-gray-400 flex items-center gap-1.5"><FolderKanban size={12} /> Projects</span>
               <ChevronRight size={10} className="text-gray-300" />
-              <span className="text-indigo-600 bg-indigo-50/50 px-3 py-1 rounded-lg border border-indigo-100">{project.title}</span>
+              <span className="text-indigo-600 truncate max-w-[150px] sm:max-w-none">{project.title}</span>
             </nav>
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-none text-gray-900 mb-4 flex items-center gap-4">
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-gray-900 mb-2 sm:mb-4">
               {project.title}
-              <div className="size-3 rounded-full animate-pulse" style={{ backgroundColor: getStatusColor(project.status) }}></div>
             </h1>
-            <p className="text-gray-500 font-bold text-base max-w-2xl leading-relaxed">
-              Workspace for project stakeholders to collaborate, share files, and track real-time activity.
+            <p className="text-gray-400 font-bold text-sm sm:text-base max-w-2xl leading-relaxed">
+              Internal ID: <span className="text-gray-900 uppercase">#SG-{project._id.slice(-6)}</span>
             </p>
           </div>
           
-          <div className="w-full md:w-auto">
+          <div className="w-full lg:w-auto shrink-0">
             {['Admin', 'Project Manager'].includes(user?.role) ? (
               <Select 
                 label="Project Status"
                 value={project.status}
                 onChange={(e) => handleStatusUpdate(e.target.value)}
                 icon={Settings2}
-                className="min-w-[240px]"
+                className="w-full lg:min-w-[240px]"
                 options={[
                   { value: 'DRAFT', label: 'DRAFT' },
                   { value: 'ACTIVE', label: 'ACTIVE' },
@@ -198,11 +196,11 @@ function WorkspaceInner() {
                 ]}
               />
             ) : (
-              <div className="flex items-center gap-4 px-8 py-5 rounded-[2rem] border border-gray-100 bg-white shadow-sm">
-                <div className="size-4 rounded-full animate-pulse" style={{ backgroundColor: getStatusColor(project.status) }}></div>
+              <div className="flex items-center gap-4 px-6 sm:px-8 py-4 sm:py-5 rounded-[1.5rem] sm:rounded-[2rem] border border-gray-100 bg-white shadow-sm w-full sm:w-auto">
+                <div className="size-3 sm:size-4 rounded-full animate-pulse" style={{ backgroundColor: getStatusColor(project.status) }}></div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Current Phase</span>
-                  <span className="text-lg font-black uppercase tracking-tight" style={{ color: getStatusColor(project.status) }}>
+                  <span className="text-[8px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1.5">Current Phase</span>
+                  <span className="text-base sm:text-lg font-black uppercase tracking-tight leading-none" style={{ color: getStatusColor(project.status) }}>
                     {project.status}
                   </span>
                 </div>
