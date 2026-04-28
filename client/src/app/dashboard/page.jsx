@@ -68,7 +68,7 @@ export default function DashboardPage() {
         <div className="space-y-3 sm:space-y-4 w-full lg:w-auto">
           <div className="flex items-center gap-3">
             <div className="size-8 sm:size-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
-              <Sparkles size={16} sm:size={20} strokeWidth={2.5} />
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
             </div>
             <span className="text-[8px] sm:text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em]">Strategic Control Center</span>
           </div>
@@ -120,11 +120,11 @@ export default function DashboardPage() {
       {isAdmin && data.workload.length > 0 && (
         <Card variant="glass" className="mb-12 group overflow-hidden" padding="p-6 sm:p-10">
            <div className="absolute top-0 right-0 p-8 sm:p-12 text-gray-100 opacity-5 group-hover:opacity-20 transition-all duration-1000 scale-150">
-             <TrendingUp size={100} sm:size={160} strokeWidth={3} />
+             <TrendingUp className="w-24 h-24 sm:w-40 sm:h-40" strokeWidth={3} />
            </div>
            
            <h2 className="text-[9px] sm:text-[11px] font-black mb-8 sm:mb-14 flex items-center gap-3 sm:gap-4 uppercase tracking-[0.3em] text-gray-400">
-             <Zap size={14} sm:size={18} className="text-indigo-600 fill-indigo-600/10" />
+             <Zap className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 text-indigo-600 fill-indigo-600/10" />
              Portfolio Load Distribution
            </h2>
            

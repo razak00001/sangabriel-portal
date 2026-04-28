@@ -90,7 +90,7 @@ export default function TeamPage() {
         <div className="space-y-3 sm:space-y-4 w-full lg:w-auto">
           <div className="flex items-center gap-3">
             <div className="size-8 sm:size-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
-              <Users size={16} sm:size={20} strokeWidth={2.5} />
+              <Users className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
             </div>
             <span className="text-[8px] sm:text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em]">Organization Oversight</span>
           </div>

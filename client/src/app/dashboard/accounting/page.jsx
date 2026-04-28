@@ -74,7 +74,7 @@ export default function AccountingDashboard() {
         <div className="space-y-3 sm:space-y-4 w-full lg:w-auto">
           <div className="flex items-center gap-3">
             <div className="size-8 sm:size-10 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-xl shadow-emerald-600/20">
-              <DollarSign size={16} sm:size={20} strokeWidth={2.5} />
+              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
             </div>
             <span className="text-[8px] sm:text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em]">Financial Oversight</span>
           </div>
@@ -141,7 +141,7 @@ export default function AccountingDashboard() {
                <h2 className="text-xs sm:text-sm font-black uppercase tracking-[0.25em] text-gray-900">Revenue Stream</h2>
              </div>
              <Link href="/dashboard/accounting/reports" className="text-[9px] sm:text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] flex items-center gap-3 hover:gap-6 transition-all group/link">
-               Deep Analytics <ArrowUpRight size={14} sm:size={16} strokeWidth={3} className="group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
+               Deep Analytics <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={3} />
              </Link>
           </div>
           
