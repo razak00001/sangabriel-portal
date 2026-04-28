@@ -110,23 +110,27 @@ export default function GridBuilder({ sectionName, initialLayout = [] }) {
 
   return (
     <div className="space-y-10 animate-slide-up">
-      <header className="flex justify-between items-center bg-white/40 p-4 rounded-2xl border border-white shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="size-8 rounded-lg bg-gray-900 flex items-center justify-center text-white">
-            <ImageIcon size={16} />
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/60 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-white shadow-sm gap-6 sm:gap-4">
+        <div className="flex items-center gap-4">
+          <div className="size-10 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-lg">
+            <ImageIcon className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
           </div>
-          <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-900">
-            {sectionName.replace('-', ' ')} Nodes
-          </h3>
+          <div>
+            <h3 className="text-[11px] sm:text-[13px] font-black uppercase tracking-[0.25em] text-gray-900 leading-none">
+              {sectionName.replace('-', ' ')}
+            </h3>
+            <p className="text-[8px] sm:text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] mt-2">Visual Node Management</p>
+          </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-3 w-full sm:w-auto">
           <Button 
             variant="secondary"
             size="sm"
             icon={Plus}
             onClick={addItem}
+            className="flex-1 sm:flex-none py-3.5 sm:py-2.5"
           >
-            Provision Box
+            Provision
           </Button>
           <Button 
             variant="primary"
@@ -134,13 +138,14 @@ export default function GridBuilder({ sectionName, initialLayout = [] }) {
             icon={Save}
             onClick={saveLayout}
             loading={isSaving}
+            className="flex-1 sm:flex-none py-3.5 sm:py-2.5 shadow-xl shadow-indigo-600/20"
           >
-            Finalize Layout
+            Finalize
           </Button>
         </div>
       </header>
 
-      <div className="min-h-[600px] bg-slate-950/5 rounded-[2.5rem] border-2 border-dashed border-gray-200 p-8 relative overflow-hidden">
+      <div className="min-h-[400px] sm:min-h-[600px] bg-slate-950/5 rounded-[2rem] sm:rounded-[2.5rem] border-2 border-dashed border-gray-200 p-4 sm:p-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
         
         <ResponsiveGridLayout
