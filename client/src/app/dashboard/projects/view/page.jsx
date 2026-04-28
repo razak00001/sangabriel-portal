@@ -66,7 +66,7 @@ function WorkspaceInner() {
 
   const fetchMessages = async () => {
     try {
-      const { data } = await api.get(`/projects/${id}/messages`);
+      const { data } = await api.get(`/messages/project/${id}`);
       setMessages(data.data || []);
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -75,7 +75,7 @@ function WorkspaceInner() {
 
   const fetchFiles = async () => {
     try {
-      const { data } = await api.get(`/projects/${id}/files`);
+      const { data } = await api.get(`/files/project/${id}`);
       setFiles(data.data || []);
     } catch (error) {
       console.error('Error fetching files:', error);
@@ -90,7 +90,7 @@ function WorkspaceInner() {
 
   const handleSendMessage = async (content) => {
     try {
-      await api.post(`/projects/${id}/messages`, { content });
+      await api.post(`/messages`, { projectId: id, content });
     } catch (error) {
       console.error('Error sending message:', error);
     }
