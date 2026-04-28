@@ -1,7 +1,6 @@
 'use client';
 
-import { useAuth } from '../../context/AuthContext';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FolderKanban, 
   Clock, 
@@ -10,205 +9,198 @@ import {
   Plus,
   ArrowRight,
   User as UserIcon,
-  Calendar
+  Calendar,
+  Sparkles,
+  Zap,
+  TrendingUp,
+  Activity as ActivityIcon
 } from 'lucide-react';
-import { dashboardService } from '../../services/dashboardService';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+
+import { useAuth } from '../../context/AuthContext';
+import { dashboardService } from '../../services/dashboardService';
+import { cn } from '../../utils/cn';
+
 import StatsCard from '../../components/ui/StatsCard';
 import ProjectListItem from '../../components/ui/ProjectListItem';
 import ActivityFeed from '../../components/ui/ActivityFeed';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 
 /**
  * DashboardPage Component
- * Provides a high-level overview of system activity and project status.
+ * Provides a high-level strategic overview of system activity and project performance.
  */
 export default function DashboardPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const [stats, setStats] = useState([]);
-  const [recentProjects, setRecentProjects] = useState([]);
-  const [activity, setActivity] = useState([]);
-  const [workload, setWorkload] = useState([]);
-  const [archiveRequests, setArchiveRequests] = useState([]);
+  const [data, setData] = useState({
+    stats: [],
+    recentProjects: [],
+    activity: [],
+    workload: [],
+    archiveRequests: []
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadData() {
+    async function loadDashboardData() {
       try {
-        const data = await dashboardService.getDashboardData();
-        setStats(data.stats);
-        setRecentProjects(data.recentProjects);
-        setActivity(data.activity);
-        setWorkload(data.workload);
-        setArchiveRequests(data.archiveRequests);
+        const result = await dashboardService.getDashboardData();
+        setData(result);
       } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error('Master dashboard load failure:', error);
       } finally {
         setLoading(false);
       }
     }
-    loadData();
+    loadDashboardData();
   }, []);
 
   const isAdmin = user?.role === 'Admin';
   const isPM = user?.role === 'Project Manager';
 
   return (
-    <div className="fade-in">
-      <header className="flex justify-between items-center mb-12">
-        <div>
-          <h1 className="text-3xl font-black mb-1">{user?.role} Dashboard</h1>
-          <p className="text-muted text-sm font-bold">Welcome back, {user?.name?.split(' ')[0] || 'User'}</p>
+    <div className="fade-in max-w-[1600px] mx-auto">
+      {/* Header Section */}
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-20 animate-slide-up">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
+              <Sparkles size={20} strokeWidth={2.5} />
+            </div>
+            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em]">Strategic Control Center</span>
+          </div>
+          <h1 className="text-6xl font-black text-gray-900 tracking-tighter leading-none">
+            Welcome, {user?.name?.split(' ')[0] || 'Executive'}
+            <span className="text-gray-200 mx-6 font-thin">|</span>
+            <span className="text-indigo-600 drop-shadow-sm">{user?.role}</span>
+          </h1>
+          <p className="text-gray-400 text-xl font-bold max-w-2xl leading-relaxed">
+            Your portfolio is currently operating at <span className="text-gray-900">optimal efficiency</span>. Here is the latest intelligence.
+          </p>
         </div>
         
-        {['Admin', 'Project Manager'].includes(user?.role) && (
-          <button className="btn btn-primary" onClick={() => router.push('/dashboard/projects')}>
-            <Plus size={18} />
-            <span>New Project</span>
-          </button>
+        {(isAdmin || isPM) && (
+          <Button 
+            variant="primary" 
+            size="lg"
+            icon={Plus}
+            onClick={() => router.push('/dashboard/projects')}
+            className="shadow-2xl shadow-indigo-600/30"
+          >
+            Initiate Project
+          </Button>
         )}
       </header>
 
-      {/* Stats Cards */}
-      <section className="responsive-grid mb-8">
-        {(loading ? Array(4).fill({}) : stats).map((stat, i) => (
+      {/* Primary Analytics Grid */}
+      <section className="responsive-grid mb-12">
+        {(loading ? Array(4).fill({}) : data.stats).map((stat, i) => (
           <StatsCard 
             key={stat.name || i}
             name={stat.name}
             value={stat.value}
-            icon={stat.icon === 'FolderKanban' ? FolderKanban : 
-                  stat.icon === 'Clock' ? Clock : 
-                  stat.icon === 'CheckCircle2' ? CheckCircle2 : 
-                  stat.icon === 'MessageCircle' ? MessageCircle : null}
+            icon={
+              stat.icon === 'FolderKanban' ? FolderKanban : 
+              stat.icon === 'Clock' ? Clock : 
+              stat.icon === 'CheckCircle2' ? CheckCircle2 : 
+              stat.icon === 'MessageCircle' ? MessageCircle : ActivityIcon
+            }
             color={stat.color}
             loading={loading}
+            trend={stat.trend}
           />
         ))}
       </section>
 
-      {/* Admin Specific: Workload Heatmap */}
-      {isAdmin && workload.length > 0 && (
-        <section className="glass p-6 mb-8">
-           <h2 className="text-sm font-black mb-6 uppercase tracking-wider">Operational Workload</h2>
-           <div className="flex gap-4 h-24 items-flex-end min-w-[400px]">
-              {workload.map((item, idx) => (
-                <div key={idx} className="flex-1 relative text-center">
-                    <div 
-                      className="bg-primary rounded-md opacity-80 mb-2 transition-all duration-500"
-                      style={{ 
-                        height: `${(item.count / Math.max(...workload.map(w => w.count))) * 100}%`
-                      }}
-                    />
-                    <span className="text-[10px] font-black uppercase text-muted truncate block">{item._id}</span>
-                </div>
-              ))}
+      {/* Strategic Operational Heatmap */}
+      {isAdmin && data.workload.length > 0 && (
+        <Card variant="glass" className="mb-12 group">
+           <div className="absolute top-0 right-0 p-12 text-gray-100 opacity-5 group-hover:opacity-20 transition-all duration-1000 scale-150">
+             <TrendingUp size={160} strokeWidth={3} />
            </div>
-        </section>
-      )}
-
-      {/* Admin Specific: Archive Queue */}
-      {isAdmin && archiveRequests.length > 0 && (
-        <section className="glass p-6 mb-10 border-l-4 border-l-indigo-600">
-           <h2 className="text-sm font-black mb-6 flex items-center gap-2 uppercase tracking-wider">
-             <Clock size={16} className="text-primary" />
-             Archive Retrieval Queue
+           
+           <h2 className="text-[11px] font-black mb-14 flex items-center gap-4 uppercase tracking-[0.3em] text-gray-400">
+             <Zap size={18} className="text-indigo-600 fill-indigo-600/10" />
+             Portfolio Operational Load Distribution
            </h2>
-           <div className="responsive-grid">
-              {archiveRequests.map((req, idx) => (
-                <div key={idx} className="p-4 bg-dark rounded-xl border border-light">
-                    <p className="text-sm font-black">{req.projectId?.title}</p>
-                    <p className="text-xs text-muted font-bold">Req: {req.requestedBy?.name}</p>
-                    <div className="mt-3 flex justify-between items-center">
-                       <span className="text-[10px] text-amber-500 font-black">SLA: 24h Remaining</span>
-                       <button className="text-[10px] text-primary font-black underline bg-none border-none cursor-pointer">Fulfill</button>
+           
+           <div className="flex gap-10 h-48 items-end min-w-full overflow-x-auto custom-scrollbar pb-6">
+              {data.workload.map((item, idx) => (
+                <div key={idx} className="flex-1 relative group/bar min-w-[100px]">
+                    <div 
+                      className="bg-indigo-600 rounded-[1.5rem] opacity-90 mb-6 transition-all duration-1000 shadow-xl shadow-indigo-600/20 group-hover/bar:scale-x-105 group-hover/bar:opacity-100 group-hover/bar:bg-indigo-500"
+                      style={{ 
+                        height: `${(item.count / Math.max(...data.workload.map(w => w.count))) * 100}%`
+                      }}
+                    >
+                       <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2.5 py-1.5 rounded-lg opacity-0 group-hover/bar:opacity-100 transition-opacity font-black">
+                         {item.count}
+                       </div>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-[11px] font-black uppercase text-gray-900 truncate block mb-1.5">{item._id}</span>
+                      <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Active Units</span>
                     </div>
                 </div>
               ))}
            </div>
-        </section>
+        </Card>
       )}
 
-      {/* PM Specific Widgets */}
-      {isPM && (
-        <div className="detail-grid mb-10">
-          <div className="glass p-6">
-            <h2 className="text-sm font-black mb-5 flex items-center gap-2 uppercase tracking-wider">
-              <Calendar size={16} className="text-primary" />
-              Installer Availability
-            </h2>
-            <div className="flex flex-col gap-3">
-               {recentProjects.filter(p => p.milestones?.some(m => m.label === 'Installation Scheduled' && !m.completed)).slice(0, 3).map((p, idx) => (
-                 <div key={idx} className="p-3 bg-dark rounded-xl flex justify-between items-center hover:bg-black/5 transition-colors">
-                    <div>
-                       <p className="text-xs font-black">{p.title}</p>
-                       <p className="text-[10px] text-emerald-500 font-black">Schedule: Confirmed</p>
-                    </div>
-                    <span className="text-[10px] text-muted font-bold">{p.installer?.name?.split(' ')[0] || 'Assigned'}</span>
-                 </div>
-               ))}
-               <button className="btn-secondary text-[10px] w-full p-2 mt-2">View Master Schedule</button>
+      {/* Main Workspace Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        {/* Project Intelligence Feed */}
+        <Card variant="glass" className="lg:col-span-2">
+          <div className="flex justify-between items-center mb-14">
+            <div className="flex items-center gap-4">
+              <div className="size-12 rounded-2xl bg-slate-950 flex items-center justify-center text-white shadow-xl">
+                <FolderKanban size={20} strokeWidth={2.5} />
+              </div>
+              <h2 className="text-sm font-black uppercase tracking-[0.25em] text-gray-900">
+                {user?.role === 'Customer' ? 'Your Engagements' : 'Strategic Portfolio'}
+              </h2>
             </div>
-          </div>
-
-          <div className="glass p-6">
-            <h2 className="text-sm font-black mb-5 flex items-center gap-2 uppercase tracking-wider">
-              <UserIcon size={16} className="text-pink-500" />
-              Recent Customer Actions
-            </h2>
-            <div className="flex flex-col gap-3">
-               {activity.filter(a => a.user?.role === 'Customer').slice(0, 3).map((a, idx) => (
-                 <div key={idx} className="p-3 bg-dark rounded-xl">
-                    <p className="text-xs">
-                      <strong className="text-pink-500 font-black">{a.user?.name}</strong> {a.action.toLowerCase()}
-                    </p>
-                    <p className="text-[10px] text-muted mt-1">{a.projectId?.title}</p>
-                 </div>
-               ))}
-               {activity.filter(a => a.user?.role === 'Customer').length === 0 && (
-                 <p className="text-center text-muted text-xs p-4">No recent activity.</p>
-               )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Detail Sections */}
-      <div className="detail-grid">
-        <div className="glass p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-sm font-black uppercase tracking-wider">{user?.role === 'Customer' ? 'Active Projects' : 'Project Pipeline'}</h2>
-            <Link href="/dashboard/projects" className="text-xs font-black text-primary flex items-center gap-1">
-              View All <ArrowRight size={12} />
+            <Link href="/dashboard/projects" className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] flex items-center gap-3 hover:gap-6 transition-all group/link">
+              Full Spectrum Analysis <ArrowRight size={16} strokeWidth={3} className="group-hover/link:translate-x-1 transition-transform" />
             </Link>
           </div>
           
           {loading ? (
-            <div className="flex flex-col gap-3">
-              <div className="h-16 w-full skeleton" />
-              <div className="h-16 w-full skeleton" />
+            <div className="space-y-6">
+              {[1, 2, 3].map(i => <div key={i} className="h-24 w-full bg-gray-50 animate-pulse rounded-3xl" />)}
             </div>
-          ) : recentProjects.length > 0 ? (
-            <div className="flex flex-col gap-3">
-              {recentProjects.map(project => (
+          ) : data.recentProjects.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6">
+              {data.recentProjects.map(project => (
                 <ProjectListItem 
                   key={project._id} 
                   project={project} 
                   onClick={() => router.push(`/dashboard/projects/view?id=${project._id}`)}
+                  className="hover:scale-[1.01] active:scale-100"
                 />
               ))}
             </div>
           ) : (
-            <div className="text-center p-8 text-muted text-sm">
-              No projects found.
+            <div className="text-center py-32 bg-gray-50/50 rounded-[3rem] border-2 border-dashed border-gray-100">
+              <FolderKanban size={48} className="text-gray-200 mb-6 mx-auto" />
+              <p className="text-xs font-black text-gray-400 uppercase tracking-[0.3em]">No active project data found</p>
             </div>
           )}
-        </div>
+        </Card>
 
-        <div className="glass p-8">
-          <h2 className="text-lg font-black mb-8">Collaboration Feed</h2>
-          <ActivityFeed activities={activity} loading={loading} />
-        </div>
+        {/* Global Communication Stream */}
+        <Card variant="glass" className="lg:col-span-1">
+          <div className="flex items-center gap-4 mb-14">
+            <div className="size-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
+              <ActivityIcon size={20} strokeWidth={2.5} />
+            </div>
+            <h2 className="text-sm font-black uppercase tracking-[0.25em] text-gray-900">Collaboration</h2>
+          </div>
+          <ActivityFeed activities={data.activity} loading={loading} />
+        </Card>
       </div>
     </div>
   );

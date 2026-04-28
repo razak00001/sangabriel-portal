@@ -1,15 +1,83 @@
 const Project = require('../models/Project');
+const User = require('../models/User');
 const ActivityLog = require('../models/ActivityLog');
 const { createNotification } = require('../utils/notificationService');
+const { sendEmail } = require('../utils/emailService');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
+const crypto = require('crypto');
 
 // @desc    Create new project
 // @route   POST /api/projects
 // @access  Private
 exports.createProject = asyncHandler(async (req, res, next) => {
-  const project = new Project({
-    ...req.body,
+  const { title, description, customerType, customerId, newCustomerName, newCustomerEmail } = req.body;
+  
+  let finalCustomerId = null;
+  let clientNameStr = '';
+
+  if (customerType === 'new') {
+    if (!newCustomerName || !newCustomerEmail) {
+      return next(new ErrorResponse('Please provide name and email for the new customer', 400));
+    }
+
+    // Check if user already exists
+    let existingUser = await User.findOne({ email: newCustomerEmail });
+    if (existingUser) {
+      return next(new ErrorResponse('A user with this email already exists', 400));
+    }
+
+    // Generate temporary password
+    const tempPassword = crypto.randomBytes(4).toString('hex'); // 8 char temp password
+
+    const user = await User.create({
+      name: newCustomerName,
+      email: newCustomerEmail,
+      password: tempPassword,
+      role: 'Customer'
+    });
+
+    finalCustomerId = user._id;
+    clientNameStr = user.name;
+
+    // Send Welcome Email with temporary credentials
+    const welcomeHtml = `
+      <h1>Welcome to San Gabriel Solutions</h1>
+      <p>Hello ${user.name},</p>
+      <p>A new project has been created for you. You can log in to our portal to track its progress.</p>
+      <p><strong>Login URL:</strong> <a href="${process.env.CLIENT_URL || 'http://localhost:3000'}">San Gabriel Portal</a></p>
+      <p><strong>Email:</strong> ${user.email}</p>
+      <p><strong>Temporary Password:</strong> ${tempPassword}</p>
+      <p>Please log in and change your password as soon as possible.</p>
+    `;
+
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: 'Welcome to San Gabriel Portal - Your Account Details',
+        html: welcomeHtml,
+        text: `Welcome! Your temp password is: ${tempPassword}`
+      });
+    } catch (err) {
+      console.error('Error sending welcome email:', err);
+      // We don't fail the project creation if email fails
+    }
+  } else if (customerType === 'existing' && customerId) {
+    const user = await User.findById(customerId);
+    if (!user) {
+      return next(new ErrorResponse('Selected customer not found', 404));
+    }
+    finalCustomerId = user._id;
+    clientNameStr = user.name;
+  } else {
+    // Fallback if just clientName is provided (old way)
+    clientNameStr = req.body.clientName;
+  }
+
+  const projectData = {
+    title,
+    description,
+    clientName: clientNameStr,
     projectManager: req.user._id,
     milestones: [
       { label: 'Design Approved', completed: false },
@@ -17,13 +85,31 @@ exports.createProject = asyncHandler(async (req, res, next) => {
       { label: 'Materials Ordered', completed: false },
       { label: 'Installation Scheduled', completed: false }
     ]
-  });
+  };
+
+  if (finalCustomerId) {
+    projectData.teamMembers = [finalCustomerId];
+  }
+
+  const project = new Project(projectData);
 
   // Auto -> ACTIVE upon assignment
   if (project.designer) {
     project.status = 'ACTIVE';
   }
   await project.save();
+
+  // If we linked a customer, notify them
+  if (finalCustomerId) {
+    await createNotification({
+      recipient: finalCustomerId,
+      sender: req.user._id,
+      type: 'ASSIGNMENT',
+      title: 'New Project Created',
+      message: `You have been added to a new project: "${project.title}"`,
+      projectId: project._id
+    });
+  }
 
   // Log activity
   const log = new ActivityLog({
@@ -183,51 +269,66 @@ exports.toggleMilestone = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/projects/:id/status
 // @access  Private
 exports.updateProjectStatus = asyncHandler(async (req, res, next) => {
-  const { status } = req.body;
-  const project = await Project.findById(req.params.id);
+  try {
+    const { status } = req.body;
+    const project = await Project.findById(req.params.id);
 
-  if (!project) {
-    return next(new ErrorResponse('Project not found', 404));
-  }
-
-  const oldStatus = project.status;
-  
-  // Status transition checks (simplified for flexibility but following logic)
-  project.status = status;
-  await project.save();
-
-  // Log activity
-  const log = new ActivityLog({
-    projectId: project._id,
-    user: req.user._id,
-    action: 'Status Updated',
-    details: { from: oldStatus, to: status }
-  });
-  await log.save();
-
-  // Notify relevant users
-  const recipients = [];
-  if (project.designer) recipients.push(project.designer);
-  if (project.installer) recipients.push(project.installer);
-  if (project.teamMembers) recipients.push(...project.teamMembers);
-  
-  for (const recipient of [...new Set(recipients)]) {
-    if (recipient.toString() !== req.user._id.toString()) {
-      await createNotification({
-        recipient,
-        sender: req.user._id,
-        type: 'STATUS_CHANGE',
-        title: 'Project Status Updated',
-        message: `Project "${project.title}" status changed to ${status}`,
-        projectId: project._id
-      });
+    if (!project) {
+      return next(new ErrorResponse('Project not found', 404));
     }
-  }
 
-  res.status(200).json({
-    success: true,
-    data: project
-  });
+    const oldStatus = project.status;
+    
+    // Status transition checks
+    project.status = status;
+    await project.save();
+
+    // Log activity
+    try {
+      const log = new ActivityLog({
+        projectId: project._id,
+        user: req.user._id,
+        action: 'Status Updated',
+        details: { from: String(oldStatus), to: String(status) }
+      });
+      await log.save();
+    } catch (logError) {
+      console.error('Activity log failure (non-blocking):', logError);
+    }
+
+    // Notify relevant users
+    const recipients = [];
+    if (project.projectManager) recipients.push(project.projectManager);
+    if (project.designer) recipients.push(project.designer);
+    if (project.installer) recipients.push(project.installer);
+    if (project.teamMembers && Array.isArray(project.teamMembers)) {
+      recipients.push(...project.teamMembers);
+    }
+    
+    // Deduplicate by string ID
+    const uniqueRecipientIds = [...new Set(recipients.filter(r => r).map(r => r.toString()))];
+
+    for (const recipientId of uniqueRecipientIds) {
+      if (recipientId !== req.user._id.toString()) {
+        await createNotification({
+          recipient: recipientId,
+          sender: req.user._id,
+          type: 'STATUS_CHANGE',
+          title: 'Project Status Updated',
+          message: `Project "${project.title}" status changed to ${status}`,
+          projectId: project._id
+        }).catch(err => console.error('Notification failure (non-blocking):', err));
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: project
+    });
+  } catch (error) {
+    console.error('CRITICAL STATUS UPDATE FAILURE:', error);
+    return next(new ErrorResponse(error.message || 'Internal Server Error during status update', 500));
+  }
 });
 
 // @desc    Auto-archive billed projects after 90 days

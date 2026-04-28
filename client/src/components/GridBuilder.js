@@ -5,8 +5,10 @@ import { Responsive, WidthProvider } from 'react-grid-layout/legacy';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { v4 as uuidv4 } from 'uuid';
+import { Plus, Save, Trash2, Image as ImageIcon } from 'lucide-react';
 import ImageCropperModal from './ImageCropperModal';
 import { sectionService } from '../services/sectionService';
+import Button from './ui/Button';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -49,7 +51,7 @@ export default function GridBuilder({ sectionName, initialLayout = [] }) {
   };
 
   const deleteItem = (id) => {
-    if (window.confirm('Are you sure you want to delete this block?')) {
+    if (window.confirm('Are you sure you want to delete this visual node?')) {
       setItems(items.filter(item => item.i !== id));
     }
   };
@@ -98,7 +100,6 @@ export default function GridBuilder({ sectionName, initialLayout = [] }) {
     setIsSaving(true);
     try {
       await sectionService.saveLayout(sectionName, items);
-      alert('Layout saved successfully!');
     } catch (error) {
       console.error('Save failed', error);
       alert('Failed to save layout.');
@@ -108,31 +109,40 @@ export default function GridBuilder({ sectionName, initialLayout = [] }) {
   };
 
   return (
-    <div className="glass" style={{ marginTop: '2rem', padding: '1.5rem', background: 'var(--bg-darker)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h3 style={{ color: 'var(--text-main)', textTransform: 'capitalize', fontWeight: '700' }}>
-          {sectionName.replace('-', ' ')} Grid
-        </h3>
-        <div>
-          <button 
-            onClick={addItem}
-            className="btn-secondary"
-            style={{ marginRight: '1rem', padding: '0.6rem 1.2rem', fontSize: '0.8125rem' }}
-          >
-            + Add Box
-          </button>
-          <button 
-            onClick={saveLayout}
-            disabled={isSaving}
-            className="btn btn-primary"
-            style={{ padding: '0.6rem 1.2rem', fontSize: '0.8125rem' }}
-          >
-            {isSaving ? 'Saving...' : 'Save Layout'}
-          </button>
+    <div className="space-y-10 animate-slide-up">
+      <header className="flex justify-between items-center bg-white/40 p-4 rounded-2xl border border-white shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="size-8 rounded-lg bg-gray-900 flex items-center justify-center text-white">
+            <ImageIcon size={16} />
+          </div>
+          <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-900">
+            {sectionName.replace('-', ' ')} Nodes
+          </h3>
         </div>
-      </div>
+        <div className="flex gap-4">
+          <Button 
+            variant="secondary"
+            size="sm"
+            icon={Plus}
+            onClick={addItem}
+          >
+            Provision Box
+          </Button>
+          <Button 
+            variant="primary"
+            size="sm"
+            icon={Save}
+            onClick={saveLayout}
+            loading={isSaving}
+          >
+            Finalize Layout
+          </Button>
+        </div>
+      </header>
 
-      <div style={{ minHeight: '400px', backgroundColor: 'var(--bg-dark)', border: '2px dashed var(--border)', borderRadius: 'var(--radius)', padding: '10px' }}>
+      <div className="min-h-[600px] bg-slate-950/5 rounded-[2.5rem] border-2 border-dashed border-gray-200 p-8 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        
         <ResponsiveGridLayout
           className="layout"
           layouts={{ lg: items }}
@@ -142,54 +152,46 @@ export default function GridBuilder({ sectionName, initialLayout = [] }) {
           onLayoutChange={handleLayoutChange}
           isDraggable={true}
           isResizable={true}
+          margin={[24, 24]}
         >
           {items.map(item => (
             <div 
               key={item.i} 
               data-grid={item}
-              className="grid-item-container"
+              className="group relative rounded-3xl overflow-hidden border border-white shadow-xl transition-all duration-500 hover:shadow-2xl hover:scale-[1.02]"
               style={{
-                backgroundColor: item.imageUrl ? 'transparent' : 'var(--bg-darker)',
-                border: '1px solid var(--border)',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                backgroundColor: item.imageUrl ? 'transparent' : 'rgba(255,255,255,0.8)',
               }}
             >
-              {item.imageUrl && (
-                <img src={item.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {item.imageUrl ? (
+                <img src={item.imageUrl} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-4 text-gray-300">
+                   <ImageIcon size={32} strokeWidth={1} />
+                   <span className="text-[8px] font-black uppercase tracking-[0.3em]">Empty Node</span>
+                </div>
               )}
               
-              <div 
-                className="grid-item-overlay"
-                style={{
-                  position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                  backgroundColor: 'rgba(15, 23, 42, 0.7)',
-                  backdropFilter: 'blur(4px)',
-                  opacity: 0, transition: 'all 0.3s ease',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  gap: '0.75rem',
-                  zIndex: 10
-                }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '0'}
-              >
-                <button 
+              <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center gap-4 z-20">
+                <Button 
+                  variant="secondary"
+                  size="sm"
                   onClick={() => triggerImageSelect(item)}
-                  style={{ padding: '0.625rem 1.25rem', background: 'white', color: 'var(--text-main)', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8125rem', fontWeight: '700' }}
+                  className="w-32 py-3"
                 >
-                  {item.imageUrl ? 'Change Image' : 'Select Photo'}
-                </button>
+                  {item.imageUrl ? 'Replace' : 'Initialize'}
+                </Button>
                 <button 
                   onClick={() => deleteItem(item.i)}
-                  style={{ padding: '0.625rem 1.25rem', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', border: '1px solid #ef4444', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8125rem', fontWeight: '700' }}
+                  className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-red-400 hover:text-red-300 transition-colors"
                 >
-                  Delete Box
+                  <Trash2 size={14} />
+                  Terminate Node
                 </button>
               </div>
+
+              {/* Resize Handle Decoration */}
+              <div className="absolute bottom-2 right-2 size-2 border-r-2 border-b-2 border-white/20 group-hover:border-white transition-colors" />
             </div>
           ))}
         </ResponsiveGridLayout>

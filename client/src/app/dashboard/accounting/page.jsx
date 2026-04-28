@@ -1,8 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../../context/AuthContext';
-import api from '../../../utils/api';
+import React, { useState, useEffect } from 'react';
 import { 
   DollarSign, 
   BarChart3, 
@@ -11,27 +9,23 @@ import {
   ArrowUpRight,
   Download,
   FileText,
-  AlertCircle
+  AlertCircle,
+  TrendingUp
 } from 'lucide-react';
 import Link from 'next/link';
+
+import { useAuth } from '../../../context/AuthContext';
+import api from '../../../utils/api';
+import { cn } from '../../../utils/cn';
+
 import StatsCard from '../../../components/ui/StatsCard';
+import Card from '../../../components/ui/Card';
+import Button from '../../../components/ui/Button';
 
-// Premium Fallback Dummy Data
-const FALLBACK_REVENUE_DATA = [
-  { _id: { month: 1, year: 2026 }, totalRevenue: 12500 },
-  { _id: { month: 2, year: 2026 }, totalRevenue: 18200 },
-  { _id: { month: 3, year: 2026 }, totalRevenue: 15400 },
-  { _id: { month: 4, year: 2026 }, totalRevenue: 24800 },
-  { _id: { month: 5, year: 2026 }, totalRevenue: 21100 },
-  { _id: { month: 6, year: 2026 }, totalRevenue: 32500 }
-];
-
-const FALLBACK_RATES = [
-  { _id: '1', category: 'Standard Consulting', rate: 150, unit: 'Hour', description: 'General accounting and financial consulting services.' },
-  { _id: '2', category: 'Premium Audit', rate: 250, unit: 'Hour', description: 'Comprehensive financial audit and compliance review.' },
-  { _id: '3', category: 'Tax Preparation', rate: 1200, unit: 'Project', description: 'Annual corporate tax preparation and filing.' }
-];
-
+/**
+ * AccountingDashboard Component
+ * A high-end financial oversight interface with advanced analytics and configuration.
+ */
 export default function AccountingDashboard() {
   const { user } = useAuth();
   const [reportData, setReportData] = useState(null);
@@ -53,78 +47,82 @@ export default function AccountingDashboard() {
       ]);
       
       setReportData({
-        volume: volumeRes.data.data,
-        status: statusRes.data.data
+        volume: volumeRes.data.data || [],
+        status: statusRes.data.data || []
       });
       
-      // Use fallback data if API returns empty arrays to keep the design "at peak"
-      setRates(ratesRes.data.data.length > 0 ? ratesRes.data.data : FALLBACK_RATES);
-      setRevenueData(revenueRes.data.data.length > 0 ? revenueRes.data.data : FALLBACK_REVENUE_DATA);
+      setRates(ratesRes.data.data || []);
+      setRevenueData(revenueRes.data.data || []);
     } catch (error) {
-      console.error('Error fetching accounting data:', error);
-      // Ensure we still show the beautiful UI even on network failure
-      setRates(FALLBACK_RATES);
-      setRevenueData(FALLBACK_REVENUE_DATA);
+      console.error('Financial intelligence load failure:', error);
+      setRates([]);
+      setRevenueData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleExportPDF = () => {
-    alert("Financial Report PDF is being generated. It will download shortly.");
-  };
-
-  const handleGenerateInvoices = () => {
-    alert("Successfully initiated batch invoice generation. 3 Invoices drafted.");
-  };
-
-  const totalRevenue = revenueData.reduce((acc, curr) => acc + curr.totalRevenue, 0);
-  // Default to some numbers if fallback is used
-  const totalBilledCount = reportData?.status?.find(s => s._id === 'BILLED')?.count || 24;
-  const avgProjectValue = totalBilledCount > 0 ? (totalRevenue / totalBilledCount).toFixed(2) : 0;
-  const awaitingBilling = reportData?.status?.find(s => s._id === 'COMPLETE')?.count || 8;
+  const totalRevenue = revenueData.reduce((acc, curr) => acc + (curr.totalRevenue || 0), 0);
+  const totalBilledCount = reportData?.status?.find(s => s._id === 'BILLED')?.count || 0;
+  const avgProjectValue = totalBilledCount > 0 ? (totalRevenue / totalBilledCount).toFixed(0) : 0;
+  const awaitingBilling = reportData?.status?.find(s => s._id === 'COMPLETE')?.count || 0;
 
   return (
-    <div className="fade-in">
-      <header className="dashboard-header">
-        <div>
-          <h1 className="header-title">Financial Performance</h1>
-          <p className="header-subtitle">Real-time revenue tracking and billing management</p>
+    <div className="fade-in max-w-[1600px] mx-auto pb-20">
+      {/* Header Section */}
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-20 animate-slide-up">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-xl shadow-emerald-600/20">
+              <DollarSign size={20} strokeWidth={2.5} />
+            </div>
+            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em]">Financial Oversight</span>
+          </div>
+          <h1 className="text-6xl font-black text-gray-900 tracking-tighter leading-none">
+            Fiscal <span className="text-emerald-600">Performance</span>
+          </h1>
+          <p className="text-gray-400 text-xl font-bold max-w-2xl leading-relaxed">
+            Real-time revenue tracking and <span className="text-gray-900">automated billing management</span>.
+          </p>
         </div>
-        <div className="action-buttons">
-           <button className="btn btn-secondary" onClick={handleExportPDF}>
-             <Download size={16} /> Export PDF
-           </button>
-           <button className="btn btn-primary" onClick={handleGenerateInvoices}>
-             <FileText size={16} /> Generate Invoices
-           </button>
+        
+        <div className="flex gap-4">
+           <Button variant="secondary" size="lg" icon={Download} onClick={() => alert("Generating report...")}>
+             Export Intelligence
+           </Button>
+           <Button variant="primary" size="lg" icon={FileText} onClick={() => alert("Provisioning invoices...")}>
+             Batch Billing
+           </Button>
         </div>
       </header>
 
+      {/* Financial KPIs */}
       <section className="responsive-grid mb-12">
         <StatsCard 
-          name="Total Revenue"
+          name="Cumulative Revenue"
           value={`$${totalRevenue.toLocaleString()}`}
           icon={DollarSign}
-          color="#4f46e5"
-          loading={loading}
-        />
-        <StatsCard 
-          name="Invoices Paid"
-          value={totalBilledCount}
-          icon={CheckCircle2}
           color="#10b981"
           loading={loading}
+          trend="+18.2%"
         />
         <StatsCard 
-          name="Avg. Ticket Size"
-          value={`$${avgProjectValue}`}
+          name="Settled Accounts"
+          value={totalBilledCount}
+          icon={CheckCircle2}
+          color="#6366f1"
+          loading={loading}
+        />
+        <StatsCard 
+          name="Mean Engagement"
+          value={`$${Number(avgProjectValue).toLocaleString()}`}
           icon={BarChart3}
           color="#ec4899"
           loading={loading}
+          trend="+5.4%"
         />
         <StatsCard 
-          name="Awaiting Billing"
+          name="Awaiting Settlement"
           value={awaitingBilling}
           icon={Clock}
           color="#f59e0b"
@@ -132,68 +130,82 @@ export default function AccountingDashboard() {
         />
       </section>
 
-      <div className="detail-grid">
-        <div className="glass p-8">
-          <div className="flex justify-between items-center mb-8 gap-4">
-             <h2 className="text-xl font-black">Revenue Trend</h2>
-             <Link href="/dashboard/accounting/reports" className="btn-link flex items-center gap-1 uppercase">
-               Analytics <ArrowUpRight size={14} />
+      {/* Advanced Analytics Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <Card variant="glass" className="lg:col-span-2 group">
+          <div className="flex justify-between items-center mb-14">
+             <div className="flex items-center gap-4">
+               <div className="size-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-xl">
+                 <TrendingUp size={20} strokeWidth={2.5} />
+               </div>
+               <h2 className="text-sm font-black uppercase tracking-[0.25em] text-gray-900">Revenue Stream</h2>
+             </div>
+             <Link href="/dashboard/accounting/reports" className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] flex items-center gap-3 hover:gap-6 transition-all group/link">
+               Deep Analytics <ArrowUpRight size={16} strokeWidth={3} className="group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
              </Link>
           </div>
           
-          <div className="chart-container">
-            <div className="chart-wrapper">
-              {loading ? (
-                <div className="w-full h-full skeleton" style={{ borderRadius: '12px' }} />
-              ) : revenueData.length > 0 ? revenueData.slice(0, 8).map((m, i) => (
-                <div key={i} className="chart-column">
-                  <div className="chart-val">${(m.totalRevenue/1000).toFixed(1)}k</div>
-                  <div 
-                    className="chart-bar"
-                    style={{ 
-                      height: `${(m.totalRevenue / Math.max(...revenueData.map(v => v.totalRevenue), 1)) * 100}%`
-                    }}
-                  />
-                  <div className="chart-label">{m._id.month}/{m._id.year}</div>
-                </div>
-              )) : (
-                <div className="empty-state w-full">
-                  <AlertCircle className="empty-state-icon" size={48} />
-                  <p className="empty-state-text">No revenue data available for the current period.</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="glass p-8">
-          <h2 className="text-xl font-black mb-6">Fee Configuration</h2>
-          <div className="fee-list">
+          <div className="h-64 flex items-end gap-6 min-w-full overflow-x-auto custom-scrollbar pb-6">
             {loading ? (
-              <div className="skeleton h-24 w-full mb-4" />
-            ) : rates.length > 0 ? rates.map((rate) => (
-              <div key={rate._id} className="fee-card">
-                <div className="fee-header">
-                  <h4 className="fee-title">{rate.category}</h4>
-                  <span className="fee-amount">${rate.rate}</span>
+              <div className="w-full h-full bg-gray-50 animate-pulse rounded-[2rem]" />
+            ) : revenueData.length > 0 ? revenueData.map((m, i) => (
+              <div key={i} className="flex-1 min-w-[80px] flex flex-col items-center group/bar">
+                <div 
+                  className="w-full bg-emerald-500/10 border-x border-t border-emerald-500/20 rounded-t-[1.5rem] relative group-hover/bar:bg-emerald-500 group-hover/bar:border-emerald-400 transition-all duration-700"
+                  style={{ 
+                    height: `${(m.totalRevenue / Math.max(...revenueData.map(v => v.totalRevenue), 1)) * 100}%`
+                  }}
+                >
+                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] px-2 py-1 rounded-lg opacity-0 group-hover/bar:opacity-100 transition-all font-black">
+                    ${(m.totalRevenue/1000).toFixed(1)}k
+                  </div>
                 </div>
-                <p className="fee-description">{rate.description}</p>
-                <div className="fee-footer">
-                    <span className="status-badge">Per {rate.unit}</span>
-                    <button className="btn-link">Manage</button>
+                <div className="mt-6 text-center">
+                  <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest block">{m._id.month}/{m._id.year}</span>
                 </div>
               </div>
             )) : (
-              <div className="empty-state">
-                <AlertCircle className="empty-state-icon" size={32} />
-                <p className="empty-state-text">No rate configurations found.</p>
+              <div className="w-full flex flex-col items-center justify-center py-20 text-gray-400">
+                <AlertCircle size={40} className="mb-4 opacity-20" />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em]">No financial data detected</p>
               </div>
             )}
-            <button className="btn btn-secondary w-full text-xs py-3 mt-4 btn-outline">
-              + Create New Rate
-            </button>
           </div>
-        </div>
+        </Card>
+
+        <Card variant="glass" className="lg:col-span-1">
+          <div className="flex items-center gap-4 mb-10">
+            <div className="size-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl">
+              <BarChart3 size={20} strokeWidth={2.5} />
+            </div>
+            <h2 className="text-sm font-black uppercase tracking-[0.25em] text-gray-900">Fee Architecture</h2>
+          </div>
+          
+          <div className="space-y-4">
+            {loading ? (
+              <div className="h-40 bg-gray-50 animate-pulse rounded-[2rem]" />
+            ) : rates.map((rate) => (
+              <div key={rate._id} className="p-6 bg-gray-50/50 border border-gray-100 rounded-[2rem] hover:bg-white hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-500 group/rate">
+                <div className="flex justify-between items-start mb-3">
+                  <h4 className="text-[11px] font-black uppercase tracking-widest text-gray-900">{rate.category}</h4>
+                  <span className="text-lg font-black text-indigo-600">${rate.rate}</span>
+                </div>
+                <p className="text-[11px] text-gray-500 leading-relaxed font-medium mb-5">{rate.description}</p>
+                <div className="flex justify-between items-center">
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 bg-white border border-gray-100 rounded-full text-gray-400">
+                      Per {rate.unit}
+                    </span>
+                    <button className="text-[9px] font-black text-indigo-600 uppercase tracking-widest hover:translate-x-1 transition-transform cursor-pointer bg-transparent border-none">
+                      Adjust
+                    </button>
+                </div>
+              </div>
+            ))}
+            <Button variant="ghost" size="sm" className="w-full py-6 rounded-[2rem] mt-6 border-dashed border-2">
+              Add New Rate Configuration
+            </Button>
+          </div>
+        </Card>
       </div>
     </div>
   );

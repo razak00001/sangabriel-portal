@@ -21,19 +21,32 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({
-  fileFilter,
-  storage: multerS3({
+// Multer Setup with S3 Fallback to Local
+let storage;
+if (process.env.S3_BUCKET_NAME) {
+  storage = multerS3({
     s3: s3,
-    bucket: process.env.S3_BUCKET_NAME || 'sangabriel-portal-dev-bucket',
-    acl: 'public-read', // Ensure bucket allows public read or manage signed URLs later
+    bucket: process.env.S3_BUCKET_NAME,
+    acl: 'public-read',
     metadata: function (req, file, cb) {
       cb(null, { fieldName: file.fieldname });
     },
     key: function (req, file, cb) {
       cb(null, `sangabriel-portal/events/${Date.now().toString()}-${file.originalname}`);
     }
-  })
+  });
+} else {
+  // Fallback to local storage for dev
+  storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, 'uploads/'),
+    filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+  });
+}
+
+const upload = multer({
+  fileFilter,
+  storage: storage,
+  limits: { fileSize: 50 * 1024 * 1024 }
 });
 
 const deleteFromS3 = async (key) => {

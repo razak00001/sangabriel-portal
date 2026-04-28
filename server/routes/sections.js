@@ -20,8 +20,8 @@ router.post('/upload', auth, uploadImage.single('image'), (req, res) => {
     return res.status(400).json({ error: 'No image uploaded' });
   }
   res.json({
-    imageUrl: req.file.location, // S3 URL
-    s3Key: req.file.key
+    imageUrl: req.file.location || `/uploads/${req.file.filename}`,
+    s3Key: req.file.key || req.file.filename
   });
 });
 
