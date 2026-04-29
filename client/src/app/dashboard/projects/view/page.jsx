@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef, Suspense } from 'react';
-import { useAuth } from '../../../../context/AuthContext';
-import api from '../../../../utils/api';
+import { useAuth } from '@/context/AuthContext';
+import api from '@/utils/api';
 import { useSearchParams } from 'next/navigation';
 import { FolderKanban, ChevronRight, LayoutDashboard, MessageSquare, Files, Activity, Settings2, Sparkles } from 'lucide-react';
 import io from 'socket.io-client';
-import { getStatusColor } from '../../../../utils/projectUtils';
-import Select from '../../../../components/ui/Select';
-import Button from '../../../../components/ui/Button';
+import { getStatusColor } from '@/utils/projectUtils';
+import Select from '@/components/ui/Select';
+import Button from '@/components/ui/Button';
 
 // Modular Tab Components
 import OverviewTab from './components/OverviewTab';
@@ -26,6 +26,7 @@ function WorkspaceInner() {
   const [messages, setMessages] = useState([]);
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [typingUser, setTypingUser] = useState(null);
   const socketRef = useRef();
   const chatEndRef = useRef();
 
@@ -50,8 +51,12 @@ function WorkspaceInner() {
   const setupSocket = () => {
     socketRef.current = io(process.env.NEXT_PUBLIC_SERVICE_URL || 'https://sangabriel-portal.onrender.com');
     socketRef.current.emit('join-project', id);
-    socketRef.current.on('new-message', (message) => {
+    // 'newMessage' is what the REST controller emits via global.io
+    socketRef.current.on('newMessage', (message) => {
       setMessages((prev) => [...prev, message]);
+    });
+    socketRef.current.on('user-typing', ({ userName, isTyping }) => {
+      setTypingUser(isTyping ? userName : null);
     });
   };
 
@@ -91,8 +96,14 @@ function WorkspaceInner() {
   };
 
   const handleSendMessage = async (content) => {
+    if (!content.trim()) return;
     try {
-      await api.post(`/messages`, { projectId: id, content });
+      const { data } = await api.post('/messages', { projectId: id, content });
+      // Optimistically add if socket is slow (REST controller also emits via global.io)
+      setMessages((prev) => {
+        const alreadyExists = prev.some(m => m._id === data.data._id);
+        return alreadyExists ? prev : [...prev, data.data];
+      });
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -242,7 +253,10 @@ function WorkspaceInner() {
               messages={messages} 
               onSendMessage={handleSendMessage} 
               user={user} 
-              chatEndRef={chatEndRef} 
+              chatEndRef={chatEndRef}
+              typingUser={typingUser}
+              socketRef={socketRef}
+              projectId={id}
             />
           </div>
         )}

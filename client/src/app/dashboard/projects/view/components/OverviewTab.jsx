@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '../../../../../context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { Info, Calendar, ShieldCheck, User, Building2, Clock, AlertCircle, Edit2, Users, Activity, Sparkles } from 'lucide-react';
-import { getStatusColor } from '../../../../../utils/projectUtils';
+import { getStatusColor } from '@/utils/projectUtils';
 import AssignTeamModal from './AssignTeamModal';
-import api from '../../../../../utils/api';
-import Card from '../../../../../components/ui/Card';
-import Button from '../../../../../components/ui/Button';
+import api from '@/utils/api';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 
 export default function OverviewTab({ project, onStatusUpdate }) {
   const { user } = useAuth();

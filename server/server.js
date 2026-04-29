@@ -30,8 +30,8 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-// Initialize Socket.io
-initSocket(server);
+// Initialize Socket.io and expose globally for controller access
+global.io = initSocket(server);
 
 // Health check for Render heartbeats
 app.get('/health', (req, res) => res.status(200).send('OK'));
