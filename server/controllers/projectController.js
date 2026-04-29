@@ -7,6 +7,17 @@ const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const crypto = require('crypto');
 
+// Helper to create and link an activity log to a project
+const logActivity = async (projectId, userId, action, details = {}) => {
+  try {
+    const log = await ActivityLog.create({ projectId, user: userId, action, details });
+    await Project.findByIdAndUpdate(projectId, { $push: { activityLogs: log._id } });
+    return log;
+  } catch (err) {
+    console.error('Activity log failure (non-blocking):', err);
+  }
+};
+
 // @desc    Create new project
 // @route   POST /api/projects
 // @access  Private
@@ -112,13 +123,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   }
 
   // Log activity
-  const log = new ActivityLog({
-    projectId: project._id,
-    user: req.user._id,
-    action: 'Project Created',
-    details: { title: project.title }
-  });
-  await log.save();
+  await logActivity(project._id, req.user._id, 'Project Created', { title: project.title });
 
   res.status(201).json({
     success: true,
@@ -159,15 +164,24 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.getProjectById = asyncHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id)
-    .populate('projectManager designer installer teamMembers files activityLogs');
+    .populate('projectManager designer installer teamMembers files');
   
   if (!project) {
     return next(new ErrorResponse(`Project not found with id of ${req.params.id}`, 404));
   }
 
+  // Fetch all activity logs for this project directly from the ActivityLog collection
+  // (more reliable than project.activityLogs ref array)
+  const activityLogs = await ActivityLog.find({ projectId: project._id })
+    .populate('user', 'name role')
+    .sort({ createdAt: 1 });
+
+  const projectObj = project.toObject();
+  projectObj.activityLogs = activityLogs;
+
   res.status(200).json({
     success: true,
-    data: project
+    data: projectObj
   });
 });
 
@@ -204,13 +218,7 @@ exports.assignTeamMembers = asyncHandler(async (req, res, next) => {
   ).populate('projectManager designer installer teamMembers');
 
   // Activity Log
-  const log = new ActivityLog({
-    projectId: project._id,
-    user: req.user._id,
-    action: 'Team Assigned',
-    details: updates
-  });
-  await log.save();
+  await logActivity(project._id, req.user._id, 'Team Assigned', updates);
 
   // Notify assigned users
   const newMembers = [designer, installer, ...(teamMembers || [])].filter(id => id && id.toString() !== req.user._id.toString());
@@ -251,13 +259,7 @@ exports.toggleMilestone = asyncHandler(async (req, res, next) => {
   await project.save();
 
   // Log activity
-  const log = new ActivityLog({
-    projectId: project._id,
-    user: req.user._id,
-    action: 'Milestone Updated',
-    details: { label: milestone.label, completed: milestone.completed }
-  });
-  await log.save();
+  await logActivity(project._id, req.user._id, 'Milestone Updated', { label: milestone.label, completed: String(milestone.completed) });
 
   res.status(200).json({
     success: true,
@@ -285,13 +287,7 @@ exports.updateProjectStatus = asyncHandler(async (req, res, next) => {
 
     // Log activity
     try {
-      const log = new ActivityLog({
-        projectId: project._id,
-        user: req.user._id,
-        action: 'Status Updated',
-        details: { from: String(oldStatus), to: String(status) }
-      });
-      await log.save();
+      await logActivity(project._id, req.user._id, 'Status Updated', { from: String(oldStatus), to: String(status) });
     } catch (logError) {
       console.error('Activity log failure (non-blocking):', logError);
     }
