@@ -86,11 +86,11 @@ export default function AccountingDashboard() {
           </p>
         </div>
         
-        <div className="flex gap-4">
-           <Button variant="secondary" size="lg" icon={Download} onClick={() => alert("Generating report...")}>
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+           <Button variant="secondary" size="lg" icon={Download} onClick={() => alert("Generating report...")} className="w-full sm:w-auto">
              Export Intelligence
            </Button>
-           <Button variant="primary" size="lg" icon={FileText} onClick={() => alert("Provisioning invoices...")}>
+           <Button variant="primary" size="lg" icon={FileText} onClick={() => alert("Provisioning invoices...")} className="w-full sm:w-auto">
              Batch Billing
            </Button>
         </div>
