@@ -1,0 +1,35 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Prevent caching of .html, .js, and .json files
+  # Ensures users always see the latest build avoid "ChunkLoadError" or state issues
+  <FilesMatch "\.(html|js|json)$">
+    Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+  </FilesMatch>
+
+  # 2. Redirect direct .html requests to extensionless URL
+  RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /+(.*)\.html\ HTTP/
+  RewriteRule ^(.*)\.html$ /$1 [R=301,L]
+
+  # 3. Handle trailing slashes (Next.js trailingSlash: true)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} !(.*)\.(.*)$
+  RewriteCond %{REQUEST_URI} !(.*)/$
+  RewriteRule ^(.*)$ $1/ [L,R=301]
+
+  # 4. Map directories to index.html (e.g. /projects/ -> /projects/index.html)
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_FILENAME}/index.html -f
+  RewriteRule ^(.*)$ $1/index.html [L]
+
+  # 5. Clean URLs (e.g. /projects -> /projects/index.html)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME}/index.html -f
+  RewriteRule ^(.*)$ $1/index.html [L]
+
+  # 6. Fallback for Static Export 404
+  ErrorDocument 404 /404/index.html
+</IfModule>
