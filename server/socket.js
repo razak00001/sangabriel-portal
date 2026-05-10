@@ -4,8 +4,9 @@ const { saveMessage } = require('./controllers/messageController');
 const initSocket = (server) => {
   const io = socketIo(server, {
     cors: {
-      origin: [process.env.FRONTEND_URL || "http://localhost:3000", "https://sangabrielportal.varnyx.tech"],
-      methods: ["GET", "POST"]
+      origin: [process.env.FRONTEND_URL, "http://localhost:3000", "https://sangabrielportal.varnyx.tech"].filter(Boolean),
+      methods: ["GET", "POST"],
+      credentials: true
     }
   });
 

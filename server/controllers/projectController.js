@@ -189,7 +189,7 @@ exports.getProjectById = asyncHandler(async (req, res, next) => {
 // @route   POST /api/projects/:id/assign
 // @access  Private
 exports.assignTeamMembers = asyncHandler(async (req, res, next) => {
-  const { designer, installer, teamMembers } = req.body;
+  const { projectManager, designer, installer, teamMembers } = req.body;
   const project = await Project.findById(req.params.id);
 
   if (!project) {
@@ -202,6 +202,7 @@ exports.assignTeamMembers = asyncHandler(async (req, res, next) => {
   }
 
   const updates = {};
+  if (projectManager) updates.projectManager = projectManager;
   if (designer) updates.designer = designer;
   if (installer) updates.installer = installer;
   if (teamMembers) updates.teamMembers = teamMembers;
