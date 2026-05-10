@@ -197,7 +197,7 @@ exports.assignTeamMembers = asyncHandler(async (req, res, next) => {
   }
 
   // Only Admin or PM can assign
-  if (req.user.role !== 'Admin' && project.projectManager?.toString() !== req.user._id.toString()) {
+  if (req.user.role !== 'Admin' && req.user.role !== 'Project Manager') {
     return next(new ErrorResponse('Unauthorized to assign team members', 403));
   }
 
@@ -212,14 +212,14 @@ exports.assignTeamMembers = asyncHandler(async (req, res, next) => {
     updates.status = 'ACTIVE';
   }
 
+  // Activity Log
+  await logActivity(project._id, req.user._id, 'Team Assigned', updates);
+
   const updatedProject = await Project.findByIdAndUpdate(
     req.params.id,
     { $set: updates },
     { new: true, runValidators: true }
-  ).populate('projectManager designer installer teamMembers');
-
-  // Activity Log
-  await logActivity(project._id, req.user._id, 'Team Assigned', updates);
+  ).populate('projectManager designer installer teamMembers activityLogs');
 
   // Notify assigned users
   const newMembers = [designer, installer, ...(teamMembers || [])].filter(id => id && id.toString() !== req.user._id.toString());
