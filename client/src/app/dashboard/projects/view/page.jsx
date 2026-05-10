@@ -246,7 +246,7 @@ function WorkspaceInner() {
 
       {/* Tab Content Area */}
       <div className="workspace-content min-h-[400px]">
-        {activeTab === 'Overview' && <OverviewTab project={project} onStatusUpdate={handleStatusUpdate} />}
+        {activeTab === 'Overview' && <OverviewTab project={project} onStatusUpdate={handleStatusUpdate} onRefresh={fetchProject} />}
         {activeTab === 'Chat' && (
           <div className="bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden h-[700px] max-h-[80vh]">
             <ChatTab 

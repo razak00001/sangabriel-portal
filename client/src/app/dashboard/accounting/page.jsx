@@ -104,7 +104,6 @@ export default function AccountingDashboard() {
           icon={DollarSign}
           color="#10b981"
           loading={loading}
-          trend="+18.2%"
         />
         <StatsCard 
           name="Settled Accounts"
@@ -119,7 +118,6 @@ export default function AccountingDashboard() {
           icon={BarChart3}
           color="#ec4899"
           loading={loading}
-          trend="+5.4%"
         />
         <StatsCard 
           name="Awaiting Settlement"

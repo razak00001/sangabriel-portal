@@ -86,21 +86,18 @@ export default function EventsAdminPage() {
           value={momentsLayout.length} 
           icon={ImageIcon} 
           color="bg-indigo-600" 
-          trend="Live Distribution"
         />
         <StatsCard 
           name="Connectivity" 
-          value="100%" 
+          value="CONNECTED" 
           icon={RefreshCw} 
           color="bg-emerald-600" 
-          trend="Stable Sync"
         />
         <StatsCard 
           name="Layout Nodes" 
           value={momentsLayout.length + conversationLayout.length} 
           icon={Layers} 
           color="bg-slate-900" 
-          trend="Orchestrated"
         />
       </section>
 

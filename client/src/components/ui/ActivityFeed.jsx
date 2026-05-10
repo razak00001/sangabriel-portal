@@ -50,7 +50,7 @@ export default function ActivityFeed({ activities, loading, className }) {
           <div className="flex-1 pt-1">
             <p className="text-[13px] leading-relaxed text-gray-700 group-hover/activity:text-gray-900 transition-colors">
               <strong className="font-black text-gray-900">{log.user?.name}</strong> 
-              <span className="mx-1.5 opacity-60 font-medium">{log.action.toLowerCase()}</span>
+              <span className="mx-1.5 opacity-60 font-black uppercase">{log.action}</span>
             </p>
             <div className="flex items-center gap-3 mt-2 text-[9px] font-black uppercase tracking-widest text-gray-400 group-hover/activity:text-indigo-400 transition-colors">
               <span>{new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>

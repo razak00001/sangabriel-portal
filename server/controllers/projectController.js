@@ -134,7 +134,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
 // Common logic for role-based project query
 const getProjectQueryByRole = (user) => {
   if (user.role === 'Admin') return {};
-  if (user.role === 'Project Manager') return { projectManager: user._id };
+  if (user.role === 'Project Manager') return {};
   if (user.role === 'Designer') return { designer: user._id };
   if (user.role === 'Installer') return { installer: user._id };
   if (user.role === 'Customer') return { teamMembers: user._id };

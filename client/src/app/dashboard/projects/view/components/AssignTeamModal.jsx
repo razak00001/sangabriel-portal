@@ -18,7 +18,15 @@ export default function AssignTeamModal({ isOpen, onClose, role, onAssign }) {
   const fetchUsersByRole = async () => {
     setLoading(true);
     try {
-      const data = await userService.getUsersByRole(role);
+      // Map display roles to backend roles
+      const roleMapping = {
+        'Lead Designer': 'Designer',
+        'Senior Installer': 'Installer',
+        'Customer Liaison': 'Customer'
+      };
+      
+      const apiRole = roleMapping[role] || role;
+      const data = await userService.getUsersByRole(apiRole);
       setUsers(Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []));
     } catch (error) {
       console.error(`Error fetching ${role}s:`, error);

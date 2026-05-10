@@ -1,12 +1,13 @@
 const Project = require('../models/Project');
 const ActivityLog = require('../models/ActivityLog');
+const Message = require('../models/Message');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
 // Common logic for role-based project query
 const getProjectQueryByRole = (user) => {
   if (user.role === 'Admin') return {};
-  if (user.role === 'Project Manager') return { projectManager: user._id };
+  if (user.role === 'Project Manager') return {};
   if (user.role === 'Designer') return { designer: user._id };
   if (user.role === 'Installer') return { installer: user._id };
   if (user.role === 'Customer') return { teamMembers: user._id };
@@ -19,18 +20,26 @@ const getProjectQueryByRole = (user) => {
 exports.getStats = asyncHandler(async (req, res, next) => {
   const query = getProjectQueryByRole(req.user);
 
-  const [total, active, complete, billed] = await Promise.all([
+  // Get project IDs for the unread messages query
+  const projects = await Project.find(query).select('_id');
+  const projectIds = projects.map(p => p._id);
+
+  const [total, active, complete, unreadCount] = await Promise.all([
     Project.countDocuments(query),
     Project.countDocuments({ ...query, status: 'ACTIVE' }),
     Project.countDocuments({ ...query, status: 'COMPLETE' }),
-    Project.countDocuments({ ...query, status: 'BILLED' })
+    Message.countDocuments({
+      projectId: { $in: projectIds },
+      sender: { $ne: req.user._id },
+      'readBy.user': { $ne: req.user._id }
+    })
   ]);
 
   const stats = [
     { name: 'Total Projects', value: total, icon: 'FolderKanban', color: '#4f46e5' },
     { name: 'Active', value: active, icon: 'Clock', color: '#0ea5e9' },
     { name: 'Completed', value: complete, icon: 'CheckCircle2', color: '#10b981' },
-    { name: 'Unread Messages', value: 0, icon: 'MessageCircle', color: '#8b5cf6' }
+    { name: 'Unread Messages', value: unreadCount, icon: 'MessageCircle', color: '#8b5cf6' }
   ];
 
   res.status(200).json({

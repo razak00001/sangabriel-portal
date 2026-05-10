@@ -8,8 +8,10 @@ import AssignTeamModal from './AssignTeamModal';
 import api from '@/utils/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import ActivityFeed from '@/components/ui/ActivityFeed';
+import { CheckCircle2, Circle } from 'lucide-react';
 
-export default function OverviewTab({ project, onStatusUpdate }) {
+export default function OverviewTab({ project, onStatusUpdate, onRefresh }) {
   const { user } = useAuth();
   const [assignRole, setAssignRole] = useState(null);
 
@@ -18,28 +20,46 @@ export default function OverviewTab({ project, onStatusUpdate }) {
   const handleAssign = async (role, userId) => {
     try {
       const payload = {};
-      if (role === 'Designer') payload.designer = userId;
-      if (role === 'Installer') payload.installer = userId;
-      if (role === 'Customer') payload.teamMembers = [userId];
+      if (role === 'Designer' || role === 'Lead Designer') payload.designer = userId;
+      if (role === 'Installer' || role === 'Senior Installer') payload.installer = userId;
+      if (role === 'Customer' || role === 'Customer Liaison') payload.teamMembers = [userId];
+      if (role === 'Project Manager') payload.projectManager = userId;
 
       await api.patch(`/projects/${project._id}/assign-team`, payload);
-      window.location.reload(); 
+      onRefresh(); 
     } catch (error) {
       console.error('Error assigning team member:', error);
+    }
+  };
+
+  const handleToggleMilestone = async (milestoneId) => {
+    try {
+      await api.patch(`/projects/${project._id}/toggle-milestone`, { milestoneId });
+      onRefresh();
+    } catch (error) {
+      console.error('Error toggling milestone:', error);
     }
   };
 
   const renderTeamMember = (role, user, colorClass) => {
     if (user) {
       return (
-        <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:bg-white hover:shadow-lg transition-all duration-500 group">
-          <div className={`size-12 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform ${colorClass}`}>
-            <User size={20} />
+        <div 
+          onClick={() => setAssignRole(role)}
+          className="flex items-center justify-between p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:bg-white hover:border-indigo-200 hover:shadow-xl transition-all duration-500 group cursor-pointer"
+        >
+          <div className="flex items-center gap-4 overflow-hidden">
+            <div className={`size-12 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform ${colorClass}`}>
+              <User size={20} />
+            </div>
+            <div className="overflow-hidden">
+              <p className="text-sm font-black text-gray-900 truncate group-hover:text-indigo-600 transition-colors">{user.name}</p>
+              <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mt-1">{role}</p>
+            </div>
           </div>
-          <div className="overflow-hidden">
-            <p className="text-sm font-black text-gray-900 truncate">{user.name}</p>
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mt-1">{role}</p>
-          </div>
+          <button className="text-[8px] font-black uppercase tracking-widest text-indigo-400 opacity-0 group-hover:opacity-100 transition-all bg-indigo-50 px-2 py-1 rounded-lg">
+            Change
+          </button>
         </div>
       );
     }
@@ -72,7 +92,7 @@ export default function OverviewTab({ project, onStatusUpdate }) {
 
             <div className="bg-white/50 backdrop-blur-sm p-8 rounded-[2rem] border border-white shadow-inner mb-8">
               <p className="text-gray-600 text-lg font-medium leading-relaxed italic">
-                "{project.description || 'Our team is dedicated to delivering excellence. This project is currently in its strategic planning phase.'}"
+                "{project.description || 'No strategic description provided for this project.'}"
               </p>
             </div>
 
@@ -126,7 +146,7 @@ export default function OverviewTab({ project, onStatusUpdate }) {
               </div>
               
               <h3 className="text-[10px] font-black text-indigo-300 uppercase tracking-[0.2em] mb-3">Principal Stakeholder</h3>
-              <h2 className="text-3xl font-black tracking-tight leading-tight mb-6">{project.clientName || 'Global Enterprise'}</h2>
+              <h2 className="text-3xl font-black tracking-tight leading-tight mb-6">{project.clientName || 'Stakeholder'}</h2>
               
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4">
                 <div className="size-10 rounded-xl bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center font-black">
@@ -247,11 +267,52 @@ export default function OverviewTab({ project, onStatusUpdate }) {
             <button className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:underline">View History</button>
           </div>
           
-          <div className="flex flex-col items-center justify-center py-16 bg-gray-50/30 rounded-[2rem] border border-dashed border-gray-100">
-            <div className="size-16 rounded-full bg-white flex items-center justify-center shadow-sm mb-4">
-              <AlertCircle size={24} className="text-gray-300" />
+          <div className="p-4 bg-gray-50/30 rounded-[2rem] border border-gray-100">
+            <ActivityFeed 
+              activities={project.activityLogs?.slice(-3).reverse()} 
+              loading={false} 
+              className="gap-6" 
+            />
+          </div>
+        </Card>
+
+        {/* Milestones Card */}
+        <Card variant="glass" className="lg:col-span-3">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="size-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
+              <Sparkles size={18} />
             </div>
-            <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">System ready for updates</p>
+            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-gray-900">Project Milestones</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {project.milestones?.map((milestone) => (
+              <div 
+                key={milestone._id}
+                onClick={() => handleToggleMilestone(milestone._id)}
+                className={`flex items-center gap-4 p-5 rounded-2xl border transition-all cursor-pointer group ${
+                  milestone.completed 
+                    ? 'bg-emerald-50 border-emerald-100' 
+                    : 'bg-white border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/30'
+                }`}
+              >
+                <div className={`size-10 rounded-xl flex items-center justify-center transition-all ${
+                  milestone.completed 
+                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
+                    : 'bg-gray-100 text-gray-400 group-hover:bg-white group-hover:text-indigo-600'
+                }`}>
+                  {milestone.completed ? <CheckCircle2 size={20} /> : <Circle size={20} />}
+                </div>
+                <div>
+                  <p className={`text-xs font-black uppercase tracking-widest ${milestone.completed ? 'text-emerald-900' : 'text-gray-900'}`}>
+                    {milestone.label}
+                  </p>
+                  <p className="text-[9px] font-bold text-gray-400 mt-1 uppercase tracking-[0.1em]">
+                    {milestone.completed ? 'Completed' : 'Pending Action'}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </Card>
       </div>

@@ -79,7 +79,7 @@ export default function DashboardPage() {
             <span className="text-indigo-600 drop-shadow-sm">{user?.role}</span>
           </h1>
           <p className="text-gray-400 text-sm sm:text-xl font-bold max-w-2xl leading-relaxed">
-            Your portfolio is currently operating at <span className="text-gray-900">optimal efficiency</span>.
+            Your portfolio currently has <span className="text-indigo-600 font-black">{data.stats.find(s => s.name === 'Active')?.value || 0} active projects</span> requiring oversight.
           </p>
         </div>
         
