@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '../../utils/cn';
+import { Eye, EyeOff } from 'lucide-react';
 
 /**
  * Input Component
@@ -19,6 +20,10 @@ export default function Input({
   success,
   ...props 
 }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === 'password';
+  const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
+
   return (
     <div className={cn("flex flex-col gap-2.5", className)}>
       {label && (
@@ -40,7 +45,7 @@ export default function Input({
         )}
         <input 
           id={id}
-          type={type}
+          type={inputType}
           required={required}
           value={value}
           onChange={onChange}
@@ -48,11 +53,21 @@ export default function Input({
           className={cn(
             "input-premium w-full",
             Icon && "pl-14",
+            isPassword && "pr-14",
             error && "border-rose-200 bg-rose-50/30 focus:border-rose-500 focus:ring-rose-500/10",
             success && "border-emerald-200 bg-emerald-50/30 focus:border-emerald-500 focus:ring-emerald-500/10"
           )}
           {...props}
         />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors z-10"
+          >
+            {showPassword ? <EyeOff size={18} strokeWidth={2.5} /> : <Eye size={18} strokeWidth={2.5} />}
+          </button>
+        )}
       </div>
       {error && (
         <p className="text-[10px] font-black text-rose-500 ml-1.5 uppercase tracking-widest animate-slide-up">
