@@ -21,4 +21,7 @@ router.delete('/:id', auth, authorize('Admin'), userController.deleteUser);
 // Toggle user status
 router.patch('/:id/toggle-status', auth, authorize('Admin'), userController.toggleUserStatus);
 
+// Reset user password
+router.patch('/:id/reset-password', auth, authorize('Admin'), userController.resetPassword);
+
 module.exports = router;

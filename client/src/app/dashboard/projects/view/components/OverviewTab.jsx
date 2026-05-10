@@ -45,7 +45,10 @@ export default function OverviewTab({ project, onStatusUpdate, onRefresh }) {
     if (user) {
       return (
         <div 
-          onClick={() => setAssignRole(role)}
+          onClick={() => {
+            console.log(`[TEAM] Card clicked for role: ${role}`);
+            setAssignRole(role);
+          }}
           className="flex items-center justify-between p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:bg-white hover:border-indigo-200 hover:shadow-xl transition-all duration-500 group cursor-pointer"
         >
           <div className="flex items-center gap-4 overflow-hidden">
@@ -66,7 +69,10 @@ export default function OverviewTab({ project, onStatusUpdate, onRefresh }) {
 
     return (
       <button 
-        onClick={() => setAssignRole(role)}
+        onClick={() => {
+          console.log(`[TEAM] Empty assign clicked for role: ${role}`);
+          setAssignRole(role);
+        }}
         className="flex items-center justify-center gap-2 p-5 rounded-2xl border-2 border-dashed border-gray-100 text-gray-400 font-black text-[10px] uppercase tracking-widest hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50/50 transition-all group"
       >
         <span className="text-lg group-hover:rotate-90 transition-transform">+</span> Assign {role}
@@ -321,7 +327,10 @@ export default function OverviewTab({ project, onStatusUpdate, onRefresh }) {
         isOpen={!!assignRole} 
         onClose={() => setAssignRole(null)} 
         role={assignRole}
-        onAssign={handleAssign}
+        onAssign={async (role, userId) => {
+          setAssignRole(null);
+          await handleAssign(role, userId);
+        }}
       />
     </div>
   );

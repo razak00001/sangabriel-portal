@@ -142,6 +142,35 @@ exports.toggleUserStatus = async (req, res) => {
   }
 };
 
+// Reset user password (Admin only)
+exports.resetPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    
+    // Only Admin can reset passwords
+    if (req.user.role !== 'Admin') {
+      return res.status(403).send({ error: 'Only admins can reset passwords' });
+    }
+    
+    if (!password || password.length < 6) {
+      return res.status(400).send({ error: 'Password must be at least 6 characters' });
+    }
+    
+    const user = await User.findById(req.params.id);
+    
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+    
+    user.password = password;
+    await user.save();
+    
+    res.send({ message: 'Password reset successfully' });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+};
+
 // Get user statistics
 exports.getUserStats = async (req, res) => {
   try {

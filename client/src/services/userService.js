@@ -49,6 +49,12 @@ export const userService = {
     const { data } = await api.patch(`/users/${userId}/toggle-status`);
     return data;
   },
+  
+  // Reset user password
+  resetPassword: async (userId, password) => {
+    const { data } = await api.patch(`/users/${userId}/reset-password`, { password });
+    return data;
+  },
 
   // Get users by role
   getUsersByRole: async (role) => {

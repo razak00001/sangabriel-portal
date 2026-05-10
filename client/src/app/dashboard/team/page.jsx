@@ -8,9 +8,12 @@ import {
   MoreVertical, 
   UserPlus, 
   Search, 
-  UserCheck,
   CheckCircle2,
-  XCircle
+  XCircle,
+  KeyRound,
+  UserX,
+  UserCheck2,
+  Trash2
 } from 'lucide-react';
 
 import { useAuth } from '../../../context/AuthContext';
@@ -32,8 +35,11 @@ export default function TeamPage() {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   useEffect(() => {
     fetchTeamMembers();
@@ -64,6 +70,42 @@ export default function TeamPage() {
     } catch (error) {
       alert(error.response?.data?.error || 'Failed to provision member');
       throw error;
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you absolutely sure you want to terminate this personnel node? This action is irreversible.')) return;
+    try {
+      await userService.deleteUser(userId);
+      setUsers(users.filter(u => u._id !== userId));
+      setOpenMenuId(null);
+    } catch (error) {
+      alert(error.response?.data?.error || 'Failed to delete user');
+    }
+  };
+
+  const handleToggleStatus = async (userId) => {
+    try {
+      const result = await userService.toggleUserStatus(userId);
+      setUsers(users.map(u => u._id === userId ? { ...u, status: result.status } : u));
+      setOpenMenuId(null);
+    } catch (error) {
+      alert(error.response?.data?.error || 'Failed to toggle status');
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    if (!selectedUser || !newPassword) return;
+    try {
+      await userService.resetPassword(selectedUser._id, newPassword);
+      alert('Password reset successfully for ' + selectedUser.name);
+      setIsResetModalOpen(false);
+      setNewPassword('');
+      setSelectedUser(null);
+      setOpenMenuId(null);
+    } catch (error) {
+      alert(error.response?.data?.error || 'Failed to reset password');
     }
   };
 
@@ -244,10 +286,61 @@ export default function TeamPage() {
                         </span>
                       </div>
                     </td>
-                    <td className="px-8 py-6 text-right">
-                      <button className="size-10 rounded-xl bg-transparent hover:bg-gray-100 text-gray-300 hover:text-gray-900 transition-all cursor-pointer border-none flex items-center justify-center ml-auto">
+                    <td className="px-8 py-6 text-right relative">
+                      <button 
+                        onClick={() => setOpenMenuId(openMenuId === u._id ? null : u._id)}
+                        className={cn(
+                          "size-10 rounded-xl transition-all cursor-pointer border-none flex items-center justify-center ml-auto",
+                          openMenuId === u._id ? "bg-indigo-600 text-white" : "bg-transparent hover:bg-gray-100 text-gray-300 hover:text-gray-900"
+                        )}
+                      >
                         <MoreVertical size={20} />
                       </button>
+
+                      {openMenuId === u._id && (
+                        <>
+                          <div 
+                            className="fixed inset-0 z-10" 
+                            onClick={() => setOpenMenuId(null)} 
+                          />
+                          <div className="absolute right-8 top-16 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 z-20 animate-slide-up overflow-hidden">
+                            <button 
+                              onClick={() => {
+                                setSelectedUser(u);
+                                setIsResetModalOpen(true);
+                              }}
+                              className="w-full px-5 py-3 text-left flex items-center gap-3 hover:bg-gray-50 text-[11px] font-black uppercase tracking-widest text-gray-700 transition-colors"
+                            >
+                              <KeyRound size={14} className="text-indigo-600" />
+                              Reset Password
+                            </button>
+                            <button 
+                              onClick={() => handleToggleStatus(u._id)}
+                              className="w-full px-5 py-3 text-left flex items-center gap-3 hover:bg-gray-50 text-[11px] font-black uppercase tracking-widest text-gray-700 transition-colors"
+                            >
+                              {u.status === 'Active' ? (
+                                <>
+                                  <UserX size={14} className="text-rose-500" />
+                                  Deactivate Node
+                                </>
+                              ) : (
+                                <>
+                                  <UserCheck2 size={14} className="text-emerald-500" />
+                                  Activate Node
+                                </>
+                              )}
+                            </button>
+                            <div className="h-px bg-gray-50 my-1" />
+                            <button 
+                              onClick={() => handleDeleteUser(u._id)}
+                              className="w-full px-5 py-3 text-left flex items-center gap-3 hover:bg-rose-50 text-[11px] font-black uppercase tracking-widest text-rose-600 transition-colors"
+                            >
+                              <Trash2 size={14} />
+                              Terminate Node
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </td>
                   </tr>
                 );
@@ -256,6 +349,47 @@ export default function TeamPage() {
           </table>
         </div>
       </Card>
+
+      {/* Reset Password Modal */}
+      <Modal
+        isOpen={isResetModalOpen}
+        onClose={() => {
+          setIsResetModalOpen(false);
+          setSelectedUser(null);
+          setNewPassword('');
+        }}
+        title="Reset Access Credentials"
+        subtitle={`Provision a new secure password for ${selectedUser?.name}`}
+        icon={KeyRound}
+        maxWidth="max-w-md"
+      >
+        <form onSubmit={handleResetPassword} className="space-y-8">
+          <Input 
+            label="New Access Key (Password)"
+            type="password"
+            required
+            value={newPassword}
+            onChange={e => setNewPassword(e.target.value)}
+            placeholder="Min. 6 high-entropy characters"
+          />
+          <div className="flex gap-4">
+            <Button 
+              variant="ghost" 
+              className="flex-1"
+              onClick={() => setIsResetModalOpen(false)}
+              type="button"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              className="flex-1 shadow-lg shadow-indigo-600/20"
+            >
+              Update Credentials
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Member Provisioning Modal */}
       <Modal
